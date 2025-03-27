@@ -1,3 +1,5 @@
+import { Button } from "../ui/button";
+
 export function Hero() {
   return (
     <section className="relative h-[80vh] overflow-hidden">
@@ -17,15 +19,15 @@ export function Hero() {
         <div className="container mx-auto px-4 h-full flex items-center">
           <div className="text-white max-w-2xl">
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              Give Your Pet the Care They Deserve
+              <p className="text-6xl"> Give Your Pet the </p>Care They Deserve
             </h1>
             <p className="text-xl mb-8">
               Your trusted partner in providing exceptional care for your
               beloved pets
             </p>
-            <button className="bg-primary px-8 py-3 rounded-full font-semibold hover:bg-opacity-90 transition duration-300">
+            <Button className="py-2 rounded-full  hover:bg-opacity-90 ">
               Book Now
-            </button>
+            </Button>
           </div>
         </div>
       </div>

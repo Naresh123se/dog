@@ -4,7 +4,15 @@ import App from "./App.jsx";
 import store from "./app/store";
 import { Provider } from "react-redux";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { Login, Register, Activate, PageNotFound } from "./components";
+import {
+  Login,
+  Register,
+  Activate,
+  PageNotFound,
+  Blog,
+  Breed,
+  AdoptionPortal,
+} from "./components";
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
 
@@ -46,6 +54,30 @@ const router = createBrowserRouter([
         element: (
           <AuthLayout authentication={false}>
             <Register />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/blog",
+        element: (
+          <AuthLayout authentication={false}>
+            <Blog />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/breed",
+        element: (
+          <AuthLayout authentication={false}>
+            <Breed />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/adoption",
+        element: (
+          <AuthLayout authentication={false}>
+            <AdoptionPortal />
           </AuthLayout>
         ),
       },
