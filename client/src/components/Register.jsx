@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRegisterMutation } from "../app/slices/userApiSlice";
-import { toast } from "react-toastify";
 
 import {
   Eye,
@@ -24,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,26 +34,28 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    control
+    control,
   } = useForm();
 
   const password = watch("password");
   const navigate = useNavigate();
   const [storeRegister, { isLoading }] = useRegisterMutation();
 
-  const onSubmit = async (data) => {
-    try {
-      const res = await storeRegister(data).unwrap();
-      console.log(res);
+const onSubmit = async (data) => {
+  toast.success("lll")
+  try {
+    const res = await storeRegister(data).unwrap();
+    if (res.success) {
+      toast.success("Please check your mail");
       navigate("/activate", {
         state: { activationToken: res.activationToken },
       });
-      toast.success("Please check your mail");
-    } catch (error) {
-      console.error(error);
-      toast.error(error?.data?.message || "An error occurred");
     }
-  };
+  } catch (err) {
+    console.log(err);
+    toast.error(err?.message || "An error occurred");
+  }
+};
 
   return (
     <div className="min-h-screen flex">
