@@ -1,13 +1,12 @@
 import { ToastContainer, Bounce } from "react-toastify";
-
 import { Outlet } from "react-router-dom";
 
 function App() {
   return (
     <>
-   <Outlet />
+      <Outlet />
       <ToastContainer
-        position="middle-right"
+        position="bottom-right" 
         autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}

@@ -41,21 +41,20 @@ const Register = () => {
   const navigate = useNavigate();
   const [storeRegister, { isLoading }] = useRegisterMutation();
 
-const onSubmit = async (data) => {
-  toast.success("lll")
-  try {
-    const res = await storeRegister(data).unwrap();
-    if (res.success) {
-      toast.success("Please check your mail");
-      navigate("/activate", {
-        state: { activationToken: res.activationToken },
-      });
+  const onSubmit = async (data) => {
+    try {
+      const res = await storeRegister(data).unwrap();
+      if (res.success) {
+        toast.success("Please check your mail");
+        navigate("/activate", {
+          state: { activationToken: res.activationToken },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.data.message);
     }
-  } catch (err) {
-    console.log(err);
-    toast.error(err?.message || "An error occurred");
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex">
