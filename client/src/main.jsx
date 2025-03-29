@@ -12,6 +12,7 @@ import {
   Blog,
   Breed,
   AdoptionPortal,
+  ContentLibrary,
 } from "./components";
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
@@ -78,6 +79,14 @@ const router = createBrowserRouter([
         element: (
           <AuthLayout authentication={false}>
             <AdoptionPortal />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/artical",
+        element: (
+          <AuthLayout authentication={false}>
+            <ContentLibrary/>
           </AuthLayout>
         ),
       },

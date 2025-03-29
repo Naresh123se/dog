@@ -9,6 +9,8 @@ import PageNotFound from "./PageNotFound";
 import Blog from "./Blog/Blog";
 import Breed from "./Breed/Breed";
 import AdoptionPortal from "./Adoption/AdoptionPortal";
+import ContentLibrary from "./Article/ContentLibrary";
+
 export {
   Login,
   Register,
@@ -20,5 +22,6 @@ export {
   Blog,
   Breed,
   AdoptionPortal,
+  ContentLibrary,
   Footer,
 };
