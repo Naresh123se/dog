@@ -2,6 +2,7 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Breed from "../models/breedModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
+import cloudinary from "cloudinary";
 
 class BreedController {
   // Add new breed
@@ -18,8 +19,26 @@ class BreedController {
       lifespan,
       size,
       temperament,
-      image,
+       images,
     } = req.body;
+
+    if (!images) {
+      return next(new ErrorHandler("Atleast one image is required", 400));
+    }
+
+    const imagesLinks = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "posts",
+        quality: "auto:best",
+        height: 600,
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
 
     const breed = await Breed.create({
       name,
@@ -33,7 +52,7 @@ class BreedController {
       lifespan,
       size,
       temperament,
-      image,
+      images: imagesLinks,
     });
 
     res.status(201).json({
@@ -84,8 +103,6 @@ class BreedController {
       temperament,
       image,
     } = req.body?.data || {}; // Ensure the array is properly accessed
-
- 
 
     let breed = await Breed.findById(req.params.id);
 

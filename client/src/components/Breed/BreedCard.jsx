@@ -9,8 +9,6 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
 
   const handleSubmit = (updatedBreed) => {
-    console.log("BreedCard received updated data:", updatedBreed);
-    // Make sure to spread the new data but keep the original ID
     onEdit({
       ...updatedBreed,
       _id: breed._id,
@@ -18,6 +16,7 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
     setIsEditOpen(false);
   };
 
+ { console.log(breed)}
   return (
     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
       <Card
@@ -26,15 +25,18 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
       >
         <div className="relative">
           <CardHeader className="p-0">
-            <img
-              src={
-                breed?.image ||
-                "https://via.placeholder.com/400x300?text=No+Image"
-              }
-              alt={breed.name}
-              className="w-full h-48 object-cover"
-              loading="lazy"
-            />
+            {breed.images && breed.images.length > 0 ? (
+              <img
+                src={breed.images[0].url}
+                alt={breed.title}
+                className="w-full h-56 object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-400">No image</span>
+              </div>
+            )}
           </CardHeader>
           <DialogTrigger asChild>
             <Button

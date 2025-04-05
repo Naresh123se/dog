@@ -48,10 +48,19 @@ const breedSchema = new mongoose.Schema({
     type: String,
     required: [true, "Temperament info is required"],
   },
-  image: {
-    type: String,
-    required: [true, "Image is required"],
-  },
+
+  images: [
+    {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

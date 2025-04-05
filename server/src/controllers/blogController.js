@@ -29,7 +29,7 @@ class BlogController {
         url: result.secure_url,
       });
     }
-console.log(imagesLinks);
+    
     const blog = await Blog.create({
       title,
       author,

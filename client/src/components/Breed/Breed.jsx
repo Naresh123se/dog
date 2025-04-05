@@ -16,7 +16,6 @@ const Breed = () => {
   const [selectedBreed, setSelectedBreed] = useState(null);
 
   const handleAddBreed = async (newBreed) => {
-    console.log(newBreed);
     try {
       await addBreed(newBreed).unwrap();
       toast.success("Breed added successfully");
@@ -27,15 +26,13 @@ const Breed = () => {
     }
   };
 
-  const handleEditBreed = async (updatedBreed) => 
-    {console.log(updateBreed)
+  const handleEditBreed = async (updatedBreed) => {
     try {
       await updateBreed({
-        id: updatedBreed._id, // Use ID from the updated breed
-        data: updatedBreed, // Send the rest as data
+        id: updatedBreed._id,
+        data: updatedBreed,
       }).unwrap();
       toast.success("Breed updated successfully");
-      // Update the selected breed if it's the one being edited
       if (selectedBreed && selectedBreed._id === updatedBreed._id) {
         setSelectedBreed(updatedBreed);
       }
