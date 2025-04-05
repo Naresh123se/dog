@@ -1,27 +1,34 @@
-// components/BlogForm.jsx
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { ImageIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const BlogForm = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const BlogForm = ({
+  isOpen,
+  onClose,
+  onSubmit,
   defaultValues = null,
-  mode = "add" // 'add' or 'edit'
+  mode = "add", // 'add' or 'edit'
 }) => {
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
+    control,
     formState: { errors },
-  } = useForm();
-
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
+  } = useForm({
+    defaultValues: {
+      images: [],
+    },
+  });
 
   useEffect(() => {
     if (defaultValues) {
@@ -32,104 +39,86 @@ const BlogForm = ({
         category: defaultValues.category,
         excerpt: defaultValues.excerpt,
       });
-      
+
       if (defaultValues.image) {
         setImagePreviews([defaultValues.image]);
+        setValue("images", [defaultValues.image]);
       }
     } else {
-      reset();
+      reset({
+        title: "",
+        author: "",
+        date: "",
+        category: "",
+        excerpt: "",
+        images: [],
+      });
       setImagePreviews([]);
-      setImageFiles([]);
     }
-  }, [defaultValues, reset]);
+  }, [defaultValues, reset, setValue]);
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
 
-const handleImageChange = (e) => {
-  const files = Array.from(e.target.files || []);
-  setErrorMessage("");
-
-  if (files.length === 0) {
-    setErrorMessage("Please select at least one image");
-    return;
-  }
-
-  // Filter valid images
-  const validImages = files.filter((file) => {
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error(`Image ${file.name} exceeds 5MB limit`);
-      return false;
-    }
-    return true;
-  });
-
-  if (validImages.length === 0) {
-    setErrorMessage("Please upload at least one valid image");
-    return;
-  }
-
-  // Create previews and update state
-  validImages.forEach((file) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setImagePreviews((prev) => [...prev, reader.result]);
-        setImageFiles((prev) => [...prev, file]);
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-};
-
-const removeImage = (index) => {
-  setImagePreviews((prev) => prev.filter((_, i) => i !== index));
-  setImageFiles((prev) => prev.filter((_, i) => i !== index));
-
-  // Clear error if we have remaining images
-  if (imagePreviews.length > 1) {
-    setErrorMessage("");
-  }
-};
-
-const handleFormSubmit = async (data) => {
-    console.log(data)
-    console.log(imagePreviews)
-  try {
-    // Validate at least one image exists
-    if (imagePreviews.length === 0) {
-      setErrorMessage("Please upload at least one image");
+    if (files.length === 0) {
+      setErrorMessage("Please select at least one image");
       return;
     }
 
-    const formData = new FormData();
-
-    // Append text fields
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
+    let validImages = [];
+    files.forEach((file) => {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`Image ${file.name} exceeds 5MB limit`);
+      } else {
+        validImages.push(file);
+      }
     });
 
-    // Append image files
-    imageFiles.forEach((file) => {
-      formData.append("images", file);
-    });
+    if (validImages.length > 0) {
+      validImages.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.readyState === 2) {
+            setImagePreviews((prev) => [...prev, reader.result]);
+            setValue("images", [...(getValues("images") || []), reader.result]);
+            setErrorMessage(""); // Clear error message
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    } else if (imagePreviews.length === 0) {
+      setErrorMessage("Please upload at least one valid image.");
+    }
+  };
 
-    // If editing and no new images, keep the existing image URL
-    if (
-      mode === "edit" &&
-      imageFiles.length === 0 &&
-      imagePreviews.length > 0
-    ) {
-      formData.append("existingImage", imagePreviews[0]);
+  const removeImage = (index) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    const currentImages = getValues("images") || [];
+    setValue(
+      "images",
+      currentImages.filter((_, i) => i !== index)
+    );
+
+    // Show error if no images are left
+    if (imagePreviews.length === 1) {
+      setErrorMessage("Please upload at least one image.");
+    }
+  };
+
+  const handleFormSubmit = async (data) => {
+    if (imagePreviews.length === 0) {
+      setErrorMessage("Please upload at least one image.");
+      return;
     }
 
-    await onSubmit(formData);
-    reset();
-    setImagePreviews([]);
-    setImageFiles([]);
-  } catch (error) {
-    toast.error("Failed to submit form");
-  }
-};
+    try {
+      await onSubmit(data);
+      reset();
+      setImagePreviews([]);
+    } catch (error) {
+      toast.error("Failed to submit form");
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -149,6 +138,7 @@ const handleFormSubmit = async (data) => {
         </div>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+          {/* Title Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Title
@@ -165,6 +155,7 @@ const handleFormSubmit = async (data) => {
             )}
           </div>
 
+          {/* Author Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Author
@@ -181,6 +172,7 @@ const handleFormSubmit = async (data) => {
             )}
           </div>
 
+          {/* Date Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Date
@@ -195,6 +187,7 @@ const handleFormSubmit = async (data) => {
             )}
           </div>
 
+          {/* Category Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Category
@@ -215,6 +208,7 @@ const handleFormSubmit = async (data) => {
             )}
           </div>
 
+          {/* Image Upload Section */}
           <div className="w-full space-y-4">
             <div className="space-y-2">
               <input
@@ -237,8 +231,10 @@ const handleFormSubmit = async (data) => {
               <p className="text-xs text-muted-foreground text-center">
                 Max size: 5MB per image
               </p>
+            </div>
 
-              {/* Image previews */}
+            <div className="space-y-2">
+              {/* Image Previews */}
               <div className="grid grid-cols-3 gap-2">
                 {imagePreviews.map((preview, index) => (
                   <div key={index} className="relative">
@@ -260,14 +256,23 @@ const handleFormSubmit = async (data) => {
                 ))}
               </div>
 
-              {errorMessage && (
-                <p className="text-sm text-red-500 text-center">
-                  {errorMessage}
-                </p>
+              {/* Empty State */}
+              {imagePreviews.length === 0 && (
+                <div className="h-24 w-full rounded-md border border-dashed border-gray-200 flex items-center justify-center">
+                  <div className="text-sm text-muted-foreground text-center p-4">
+                    <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No images uploaded</p>
+                  </div>
+                </div>
               )}
             </div>
+
+            {errorMessage && (
+              <p className="text-sm text-red-500 text-center">{errorMessage}</p>
+            )}
           </div>
 
+          {/* Excerpt Field */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Excerpt
@@ -285,6 +290,7 @@ const handleFormSubmit = async (data) => {
             )}
           </div>
 
+          {/* Form Actions */}
           <div className="flex justify-end gap-2">
             <button
               type="button"

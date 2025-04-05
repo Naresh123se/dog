@@ -2,6 +2,7 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Blog from "../models/blogModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
+import cloudinary from "cloudinary";
 
 class BlogController {
   /**
@@ -9,16 +10,32 @@ class BlogController {
    */
   static createBlog = asyncHandler(async (req, res, next) => {
     const { title, author, category, date, images, excerpt } = req.body;
-    
-    console.log(req.body)
 
+    if (!images) {
+      return next(new ErrorHandler("Atleast one image is required", 400));
+    }
+
+    const imagesLinks = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "posts",
+        quality: "auto:best",
+        height: 600,
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+console.log(imagesLinks);
     const blog = await Blog.create({
       title,
       author,
       category,
       date,
       excerpt,
-      image: images, // Placeholder; update with actual image handling
+      images: imagesLinks, // Placeholder; update with actual image handling
     });
 
     return res.status(201).json({
@@ -103,7 +120,7 @@ class BlogController {
       return next(new ErrorHandler("Blog post not found", 404));
     }
 
-      await blog.deleteOne();
+    await blog.deleteOne();
 
     return res.status(200).json({
       success: true,
