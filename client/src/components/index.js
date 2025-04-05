@@ -10,6 +10,7 @@ import Blog from "./Blog/Blog";
 import Breed from "./Breed/Breed";
 import AdoptionPortal from "./Adoption/AdoptionPortal";
 import ContentLibrary from "./Article/ContentLibrary";
+import Profile from "./Profile";
 
 export {
   Login,
@@ -23,5 +24,6 @@ export {
   Breed,
   AdoptionPortal,
   ContentLibrary,
+  Profile,
   Footer,
 };

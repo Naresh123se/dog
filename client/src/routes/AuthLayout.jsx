@@ -15,7 +15,7 @@ export default function Protected({ children, authentication = true }) {
       } 
       setLoading(false); // Loading completes after redirection check
     };
-
+<nav></nav>
     checkAuth();
   }, [authStatus, navigate, authentication]);
 

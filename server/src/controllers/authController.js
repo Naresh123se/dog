@@ -8,12 +8,14 @@ import { fileURLToPath } from "url";
 import sendMail from "../utils/sendMail.js";
 import createActivationToken from "../utils/activation.js";
 import { sendToken } from "../utils/jwt.js";
+import cloudinary from "cloudinary";
+
 
 class AuthController {
   static registration = asyncHandler(async (req, res, next) => {
     try {
       const { name, email, password, address, phone, gender } = req.body;
-      console.log(req.body)
+      console.log(req.body);
 
       if (!name) {
         return next(new ErrorHandler("Name cannot be empty", 400));
@@ -97,7 +99,8 @@ class AuthController {
         return next(new ErrorHandler("Invalid activation Code", 400));
       }
 
-      const { name, email, password, address, phone, gender } = newUser?.userdata;
+      const { name, email, password, address, phone, gender } =
+        newUser?.userdata;
 
       const existUser = await User.findOne({ email });
 
@@ -241,6 +244,54 @@ class AuthController {
           success: true,
           message: "Profile Updated Successfully",
         });
+      }
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  });
+
+  static updateProfile = asyncHandler(async (req, res, next) => {
+    try {
+      const { name, address, phone, avatar, bio } = req.body;
+      const userId = req.user._id;
+
+      if (!name && !address && !phone && !avatar) {
+        return next(new ErrorHandler("At least one field is required", 400));
+      }
+
+      // Handle image upload
+      let uploadedImage = {};
+      if (avatar) {
+        const result = await cloudinary.v2.uploader.upload(avatar, {
+          folder: "avatars",
+          resource_type: "auto",
+        });
+        uploadedImage = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
+      }
+
+      // Build update object with only provided fields
+      const updateData = {};
+      if (name) updateData.name = name;
+      if (address) updateData.address = address;
+      if (phone) updateData.phone = phone;
+      if (bio) updateData.bio = bio;
+      if (avatar) updateData.avatar = uploadedImage;
+
+      const user = await User.findByIdAndUpdate(userId, updateData, {
+        runValidators: true,
+        new: true,
+      });
+
+      if (user) {
+        return res.status(200).json({
+          success: true,
+          message: "Profile Updated Successfully",
+        });
+      } else {
+        return next(new ErrorHandler("User not found", 404));
       }
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));

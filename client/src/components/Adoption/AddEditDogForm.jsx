@@ -1,5 +1,5 @@
-// components/AddEditDogForm.jsx
-import React from "react";
+
+
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -40,6 +40,8 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
       size: "Medium", // Default to 'Medium' instead of empty string
     },
   });
+
+ 
 
   const breeds = [
     "Labrador Retriever",

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const DistributorLayout = ({ children }) => {
+const AdminLayout = ({ children }) => {
   const userInfo = useSelector((state) => state?.auth?.user);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -16,14 +16,14 @@ const DistributorLayout = ({ children }) => {
       }
 
       // If userInfo is available, check the role
-      if (userInfo?.role !== "distributor") {
+      if (userInfo?.role !== "admin") {
         console.log("User is not an admin, redirecting to home...");
         navigate("/");
-
+        // toast.error("You are not authorized to access this page");
         return;
       }
 
-      // If user is an distributor, allow access
+      // If user is an admin, allow access
       setLoading(false);
     };
     checkAdmin();
@@ -36,4 +36,4 @@ const DistributorLayout = ({ children }) => {
   return <>{children}</>;
 };
 
-export default DistributorLayout;
+export default AdminLayout;

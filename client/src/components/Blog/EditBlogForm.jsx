@@ -1,5 +1,6 @@
-import React from "react";
+// components/EditBlogForm.jsx
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 
 const EditBlogForm = ({ isOpen, onClose, onSubmit, blogPost }) => {
   const {
@@ -7,9 +8,20 @@ const EditBlogForm = ({ isOpen, onClose, onSubmit, blogPost }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    defaultValues: blogPost, // Pre-fill form with existing blog post data
-  });
+  } = useForm();
+
+  useEffect(() => {
+    if (blogPost) {
+      reset({
+        title: blogPost.title,
+        author: blogPost.author,
+        date: blogPost.date.split("T")[0],
+        category: blogPost.category,
+        image: blogPost.image,
+        excerpt: blogPost.excerpt,
+      });
+    }
+  }, [blogPost, reset]);
 
   const handleFormSubmit = (data) => {
     onSubmit(data);
@@ -50,6 +62,22 @@ const EditBlogForm = ({ isOpen, onClose, onSubmit, blogPost }) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
+              Author
+            </label>
+            <input
+              {...register("author", { required: "Author is required" })}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter author name"
+            />
+            {errors.author && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.author.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
               Date
             </label>
             <input
@@ -59,6 +87,26 @@ const EditBlogForm = ({ isOpen, onClose, onSubmit, blogPost }) => {
             />
             {errors.date && (
               <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Category
+            </label>
+            <select
+              {...register("category", { required: "Category is required" })}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select a category</option>
+              <option value="Pet Care">Pet Care</option>
+              <option value="Breeds">Breeds</option>
+              <option value="Training">Training</option>
+            </select>
+            {errors.category && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.category.message}
+              </p>
             )}
           </div>
 
@@ -91,42 +139,6 @@ const EditBlogForm = ({ isOpen, onClose, onSubmit, blogPost }) => {
             {errors.excerpt && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.excerpt.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Author
-            </label>
-            <input
-              {...register("author", { required: "Author is required" })}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter author name"
-            />
-            {errors.author && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.author.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
-            <select
-              {...register("category", { required: "Category is required" })}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select a category</option>
-              <option value="Pet Care">Pet Care</option>
-              <option value="Breeds">Breeds</option>
-              <option value="Training">Training</option>
-            </select>
-            {errors.category && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.category.message}
               </p>
             )}
           </div>

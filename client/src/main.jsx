@@ -9,15 +9,16 @@ import {
   Register,
   Activate,
   PageNotFound,
-  Blog,
   Breed,
   AdoptionPortal,
   ContentLibrary,
+  Profile,
+  Blog,
 } from "./components";
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
 
-import { HomePage } from "./pages";
+import { HomePage, UsersPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -59,36 +60,80 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/blog",
+        path: "/profile",
         element: (
-          <AuthLayout authentication={false}>
-            <Blog />
+          <AuthLayout authentication={true}>
+            <Profile />
           </AuthLayout>
         ),
       },
-      {
-        path: "/breed",
-        element: (
-          <AuthLayout authentication={false}>
-            <Breed />
-          </AuthLayout>
-        ),
-      },
-      {
-        path: "/adoption",
-        element: (
-          <AuthLayout authentication={false}>
-            <AdoptionPortal />
-          </AuthLayout>
-        ),
-      },
+      // {
+      //   path: "/blog",
+      //   element: (
+      //     <AuthLayout authentication={false}>
+      //       <BlogPage />
+      //     </AuthLayout>
+      //   ),
+      // },
+      // {
+      //   path: "/breed",
+      //   element: (
+      //     <AuthLayout authentication={false}>
+      //       <Breed />
+      //     </AuthLayout>
+      //   ),
+      // },
+
       {
         path: "/artical",
         element: (
           <AuthLayout authentication={false}>
-            <ContentLibrary/>
+            <ContentLibrary />
           </AuthLayout>
         ),
+      },
+
+      {
+        path: "/",
+        element: <UsersPage />,
+        children: [
+          // {
+          //   index: true,
+          //   element: <Distributor />,bc
+          // },
+          {
+            path: "breed",
+            element: (
+              <AuthLayout authentication={false}>
+                <Breed />
+              </AuthLayout>
+            ),
+          },
+          {
+            path: "blog",
+            element: (
+              <AuthLayout authentication={false}>
+                <Blog />
+              </AuthLayout>
+            ),
+          },
+          {
+            path: "/adoption",
+            element: (
+              <AuthLayout authentication={false}>
+                <AdoptionPortal />
+              </AuthLayout>
+            ),
+          },
+          // {
+          //   path: "add-product",
+          //   element: <AddProduct />,
+          // },
+          // {
+          //   path: "edit-product/:id",
+          //   element: <EditProduct />,
+          // },
+        ],
       },
     ],
   },
