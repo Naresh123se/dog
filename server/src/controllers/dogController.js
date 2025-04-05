@@ -2,15 +2,31 @@
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Dog from "../models/dogModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
+import cloudinary from "cloudinary";
 
 class DogController {
   // Add new dog
   static addDog = asyncHandler(async (req, res, next) => {
-    const { name, age, breed, location, shelter, bio, gender, size } = req.body;
+    const { name, age, breed, location, shelter, bio, gender, size, photos } =
+      req.body;
 
-    // if (!req.file) {
-    //   return next(new ErrorHandler("Dog photo is required", 400));
-    // }
+    if (!photos) {
+      return next(new ErrorHandler("Atleast one image is required", 400));
+    }
+
+    const imagesLinks = [];
+    for (let i = 0; i < photos.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(photos[i], {
+        folder: "dogs",
+        quality: "auto:best",
+        height: 600,
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
 
     const dog = await Dog.create({
       name,
@@ -21,8 +37,8 @@ class DogController {
       bio,
       gender,
       size,
-      photo:"sjdnsjandbn", // Assuming you're using file upload middleware
-    });
+      photo: imagesLinks, // Assuming you're using file upload middleware
+    });   
 
     res.status(201).json({
       success: true,

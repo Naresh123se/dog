@@ -27,10 +27,18 @@ const dogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  photo: {
-    type: String, // Just store URL if not using Cloudinary
-    required: true,
-  },
+  photo: [
+    {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   gender: {
     type: String,
     enum: ["male", "female"],

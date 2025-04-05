@@ -29,7 +29,7 @@ class BreedController {
     const imagesLinks = [];
     for (let i = 0; i < images.length; i++) {
       const result = await cloudinary.v2.uploader.upload(images[i], {
-        folder: "posts",
+        folder: "breeds",
         quality: "auto:best",
         height: 600,
       });

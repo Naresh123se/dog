@@ -1,5 +1,3 @@
-
-
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -19,14 +17,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "../ui/scroll-area";
+import { useEffect, useState } from "react";
+import { ImageIcon, X } from "lucide-react";
+import { toast } from "react-toastify";
 
-export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGES = 5; // Maximum number of images allowed
+
+export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm({
     defaultValues: dog || {
       name: "",
@@ -35,13 +44,11 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
       location: "",
       shelter: "",
       bio: "",
-      photo: "",
-      gender: "male", // Default to 'male' instead of empty string
-      size: "Medium", // Default to 'Medium' instead of empty string
+      photos: [], // Changed to array for multiple images
+      gender: "male",
+      size: "Medium",
     },
   });
-
- 
 
   const breeds = [
     "Labrador Retriever",
@@ -56,10 +63,96 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
 
   const sizes = ["Small", "Medium", "Large", "X-Large"];
 
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
+
+    if (files.length === 0) {
+      setErrorMessage("Please select at least one image.");
+      return;
+    }
+
+    // Check total images won't exceed limit
+    if (imagePreviews.length + files.length > MAX_IMAGES) {
+      setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+
+    // Validate file sizes
+    const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      toast.error(`Some images exceed 5MB limit`);
+      return;
+    }
+
+    setUploading(true);
+    setErrorMessage("");
+
+    // Process each file to base64
+    const promises = files.map((file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(promises)
+      .then((newBase64Images) => {
+        setImagePreviews((prev) => [...prev, ...newBase64Images]);
+        setValue("photos", [...watch("photos"), ...newBase64Images], {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      })
+      .catch((error) => {
+        toast.error("Failed to process images");
+        console.error("Image processing error:", error);
+      })
+      .finally(() => {
+        setUploading(false);
+      });
+  };
+
+  const removeImage = (index) => {
+    const newPreviews = [...imagePreviews];
+    newPreviews.splice(index, 1);
+    setImagePreviews(newPreviews);
+    setValue("photos", newPreviews, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
   // Set form values when select changes
   const handleSelectChange = (name, value) => {
     setValue(name, value, { shouldValidate: true });
   };
+
+  // Initialize form with dog data
+  useEffect(() => {
+    if (dog) {
+      reset({
+        ...dog,
+        photos: dog.photos || [], // Ensure photos is an array
+      });
+      if (dog.photos?.length) {
+        setImagePreviews(dog.photos);
+      }
+    } else {
+      reset({
+        name: "",
+        age: "",
+        breed: "",
+        location: "",
+        shelter: "",
+        bio: "",
+        photos: [],
+        gender: "male",
+        size: "Medium",
+      });
+      setImagePreviews([]);
+    }
+  }, [dog, reset]);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -85,7 +178,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
               )}
             </div>
 
-            {/* Age field remains the same */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="age">Age (years) *</Label>
@@ -108,7 +200,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
                 )}
               </div>
 
-              {/* Gender select - fixed */}
               <div>
                 <Label htmlFor="gender">Gender *</Label>
                 <Select
@@ -132,7 +223,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* Breed select - fixed */}
               <div>
                 <Label htmlFor="breed">Breed *</Label>
                 <Select
@@ -157,7 +247,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
                 )}
               </div>
 
-              {/* Size select - fixed */}
               <div>
                 <Label htmlFor="size">Size *</Label>
                 <Select
@@ -183,7 +272,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
               </div>
             </div>
 
-            {/* Rest of the form fields remain the same */}
             <div>
               <Label htmlFor="location">Location *</Label>
               <Input
@@ -222,32 +310,83 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit }) => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="photo">Photo URL *</Label>
+            {/* Image Upload Section */}
+            <div className="space-y-2">
+              <Label>Photos (Max {MAX_IMAGES})</Label>
               <Input
-                id="photo"
-                {...register("photo", {
-                  required: "Photo is required",
-                  pattern: {
-                    value: /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i,
-                    message: "Please enter a valid URL",
-                  },
-                })}
-                placeholder="https://example.com/dog.jpg"
-                className={errors.photo && "border-red-500"}
+                id="photos"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageChange}
+                disabled={uploading || imagePreviews.length >= MAX_IMAGES}
               />
-              {errors.photo && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.photo.message}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => document.getElementById("photos")?.click()}
+                disabled={uploading || imagePreviews.length >= MAX_IMAGES}
+              >
+                <ImageIcon className="mr-2 h-4 w-4" />
+                {uploading ? "Uploading..." : "Upload Photos"}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Max {MAX_IMAGES} images, 5MB each (JPEG, PNG)
+              </p>
+            </div>
+
+            {/* Image Previews */}
+            <div className="space-y-2">
+              {imagePreviews.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {imagePreviews.map((base64, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={base64}
+                        alt={`Preview ${index + 1}`}
+                        className="h-24 w-full object-cover rounded-md"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-5 w-5 rounded-full"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-24 w-full rounded-md border border-dashed border-gray-200 flex items-center justify-center">
+                  <div className="text-sm text-muted-foreground text-center p-4">
+                    <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No photos uploaded</p>
+                  </div>
+                </div>
+              )}
+              {errorMessage && (
+                <p className="text-sm text-red-500 text-center">
+                  {errorMessage}
                 </p>
               )}
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
-              <Button type="submit">{dog ? "Update" : "Add Dog"}</Button>
+              <Button type="submit" disabled={isLoading || uploading}>
+                {isLoading ? "Processing..." : dog ? "Update" : "Add Dog"}
+              </Button>
             </div>
           </ScrollArea>
         </form>

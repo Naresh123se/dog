@@ -19,7 +19,7 @@ class BlogController {
     const imagesLinks = [];
     for (let i = 0; i < images.length; i++) {
       const result = await cloudinary.v2.uploader.upload(images[i], {
-        folder: "posts",
+        folder: "blogs",
         quality: "auto:best",
         height: 600,
       });
@@ -29,7 +29,7 @@ class BlogController {
         url: result.secure_url,
       });
     }
-    
+
     const blog = await Blog.create({
       title,
       author,

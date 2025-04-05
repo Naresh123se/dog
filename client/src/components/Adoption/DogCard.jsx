@@ -19,14 +19,18 @@ export const DogCard = ({ dog, onEdit, onFavorite }) => {
     <Card className="w-full max-w-sm mx-auto overflow-hidden shadow-lg rounded-xl hover:shadow-2xl transition-all duration-300 group">
       <div className="relative">
         <div className="relative">
-          <img
-            src={dog.photo}
-            alt={dog.name}
-            className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              e.target.src = "https://placehold.co/400x300?text=Dog+Image";
-            }}
-          />
+          {dog.photo && dog.photo.length > 0 ? (
+            <img
+              src={dog.photo[0].url}
+              alt={dog.title}
+              className="w-full h-56 object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400">No image</span>
+            </div>
+          )}
           <div className="absolute top-0 left-0 right-0 flex justify-between p-4">
             <Badge className={`${getAgeColor(dog.age)} shadow-md`}>
               {dog.age <= 1 ? "Puppy" : dog.age <= 7 ? "Adult" : "Senior"} (
