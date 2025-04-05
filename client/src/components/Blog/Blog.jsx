@@ -1,10 +1,8 @@
-// components/Blog.jsx
 import React, { useState } from "react";
-import AddBlogForm from "./AddBlogForm";
-import EditBlogForm from "./EditBlogForm";
+import BlogForm from "./BlogForm";
 import {
   useGetAllBlogsQuery,
-   useCreateBlogMutation,
+  useCreateBlogMutation,
   useUpdateBlogMutation,
   useDeleteBlogMutation,
 } from "@/app/slices/blogApiSlice";
@@ -23,47 +21,73 @@ const Blog = () => {
   const [updateBlog] = useUpdateBlogMutation();
   const [deleteBlog] = useDeleteBlogMutation();
 
-  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
-  const handleAddPost = async (newPost) => {
-    try {
-      await addBlog(newPost).unwrap();
+const handleAddPost = async (formData) => {
+  try {
+    // Convert FormData to JSON if needed
+    const jsonData =
+      formData instanceof FormData
+        ? Object.fromEntries(formData.entries())
+        : formData;
+
+    const res = await addBlog(jsonData).unwrap();
+    if (res.success) {
       toast.success("Blog post added successfully");
       refetch();
-      setIsAddFormOpen(false);
-    } catch (error) {
-      toast.error(error?.data?.message || "Failed to add blog post");
+      setIsFormOpen(false);
     }
-  };
+  } catch (error) {
+    toast.error(error?.data?.message || "Failed to add blog post");
+  }
+};
 
-  const handleEditPost = async (updatedPost) => {
-    console.log("first")
-    try {
-      await updateBlog({ id: selectedPost._id, ...updatedPost }).unwrap();
+const handleEditPost = async (formData) => {
+  try {
+    // Convert FormData to JSON if needed
+    const jsonData =
+      formData instanceof FormData
+        ? Object.fromEntries(formData.entries())
+        : formData;
+
+    // Add the ID to the data
+    jsonData.id = selectedPost._id;
+
+    const res = await updateBlog(jsonData).unwrap();
+    if (res.success) {
       toast.success("Blog post updated successfully");
       refetch();
-      setIsEditFormOpen(false);
+      setIsFormOpen(false);
       setSelectedPost(null);
-    } catch (error) {
-      toast.error(error?.data?.message || "Failed to update blog post");
     }
-  };
+  } catch (error) {
+    toast.error(error?.data?.message || "Failed to update blog post");
+  }
+};
 
   const handleDeletePost = async (postId) => {
-    try {
-      await deleteBlog(postId).unwrap();
-      toast.success("Blog post deleted successfully");
-      refetch();
-    } catch (error) {
-      toast.error(error?.data?.message || "Failed to delete blog post");
+    if (window.confirm("Are you sure you want to delete this blog post?")) {
+      try {
+        const res = await deleteBlog(postId).unwrap();
+        if (res.success) {
+          toast.success("Blog post deleted successfully");
+          refetch();
+        }
+      } catch (error) {
+        toast.error(error?.data?.message || "Failed to delete blog post");
+      }
     }
   };
 
   const openEditForm = (post) => {
     setSelectedPost(post);
-    setIsEditFormOpen(true);
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setSelectedPost(null);
   };
 
   if (isLoading) {
@@ -123,7 +147,7 @@ const Blog = () => {
             </p>
           </div>
           <button
-            onClick={() => setIsAddFormOpen(true)}
+            onClick={() => setIsFormOpen(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             Add New Post
@@ -142,7 +166,7 @@ const Blog = () => {
               Start by adding your first blog post!
             </p>
             <button
-              onClick={() => setIsAddFormOpen(true)}
+              onClick={() => setIsFormOpen(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Create First Post
@@ -155,11 +179,17 @@ const Blog = () => {
                 key={post._id}
                 className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
               >
-                <img
-                  src={post.image || "/default-blog-image.jpg"}
-                  alt={post.title}
-                  className="w-full h-56 object-cover"
-                />
+                {post.image ? (
+                  <img
+                    src={Array.isArray(post.image) ? post.image[0] : post.image}
+                    alt={post.title}
+                    className="w-full h-56 object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400">No image</span>
+                  </div>
+                )}
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
                     <span className="inline-block px-3 py-1 text-sm font-semibold text-white bg-blue-600 rounded-full">
@@ -201,19 +231,13 @@ const Blog = () => {
         )}
       </main>
 
-      {/* Add Blog Form */}
-      <AddBlogForm
-        isOpen={isAddFormOpen}
-        onClose={() => setIsAddFormOpen(false)}
-        onSubmit={handleAddPost}
-      />
-
-      {/* Edit Blog Form */}
-      <EditBlogForm
-        isOpen={isEditFormOpen}
-        onClose={() => setIsEditFormOpen(false)}
-        onSubmit={handleEditPost}
-        blogPost={selectedPost}
+      {/* Blog Form */}
+      <BlogForm
+        isOpen={isFormOpen}
+        onClose={handleCloseForm}
+        onSubmit={selectedPost ? handleEditPost : handleAddPost}
+        defaultValues={selectedPost}
+        mode={selectedPost ? "edit" : "add"}
       />
     </div>
   );

@@ -1,21 +1,67 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import BreedList from "./BreedList";
-import { dogBreeds as initialBreeds } from "./BreedData";
+import {
+  useGetAllBreedsQuery,
+  useAddBreedMutation,
+  useUpdateBreedMutation,
+  useDeleteBreedMutation,
+} from "@/app/slices/breedApiSlice";
+import { toast } from "react-toastify";
 
 const Breed = () => {
-  const [breeds, setBreeds] = useState(initialBreeds);
+  const { data: breeds, isLoading, isError, refetch } = useGetAllBreedsQuery();
+  const [addBreed] = useAddBreedMutation();
+  const [updateBreed] = useUpdateBreedMutation();
+  const [deleteBreed] = useDeleteBreedMutation();
   const [selectedBreed, setSelectedBreed] = useState(null);
 
-  const addBreed = (newBreed) => {
-    setBreeds((prev) => [...prev, { ...newBreed, id: prev.length + 1 }]);
+  const handleAddBreed = async (newBreed) => {
+    console.log(newBreed);
+    try {
+      await addBreed(newBreed).unwrap();
+      toast.success("Breed added successfully");
+      refetch();
+    } catch (err) {
+      toast.error("Failed to add breed");
+      console.error("Failed to add breed:", err);
+    }
   };
 
-  const editBreed = (updatedBreed) => {
-    setBreeds((prev) =>
-      prev.map((b) => (b.id === updatedBreed.id ? updatedBreed : b))
-    );
-    if (selectedBreed?.id === updatedBreed.id) setSelectedBreed(updatedBreed);
+  const handleEditBreed = async (updatedBreed) => 
+    {console.log(updateBreed)
+    try {
+      await updateBreed({
+        id: updatedBreed._id, // Use ID from the updated breed
+        data: updatedBreed, // Send the rest as data
+      }).unwrap();
+      toast.success("Breed updated successfully");
+      // Update the selected breed if it's the one being edited
+      if (selectedBreed && selectedBreed._id === updatedBreed._id) {
+        setSelectedBreed(updatedBreed);
+      }
+      refetch();
+    } catch (err) {
+      toast.error("Failed to update breed");
+      console.error("Failed to update breed:", err);
+    }
   };
+
+  const handleDeleteBreed = async (id) => {
+    try {
+      await deleteBreed(id).unwrap();
+      toast.success("Breed deleted successfully");
+      refetch();
+      if (selectedBreed?._id === id) {
+        setSelectedBreed(null);
+      }
+    } catch (err) {
+      toast.error("Failed to delete breed");
+      console.error("Failed to delete breed:", err);
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error loading breeds</div>;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -31,8 +77,9 @@ const Breed = () => {
           breeds={breeds}
           onSelectBreed={setSelectedBreed}
           selectedBreed={selectedBreed}
-          onAddBreed={addBreed}
-          onEditBreed={editBreed}
+          onAddBreed={handleAddBreed}
+          onEditBreed={handleEditBreed}
+          onDeleteBreed={handleDeleteBreed}
         />
       </main>
     </div>

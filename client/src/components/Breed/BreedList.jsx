@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import BreedCard from "./BreedCard";
 import BreedForm from "./BreedForm";
+import { Button } from "../ui/button";
+import { Trash2, AlertCircle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -8,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import BreedProfile from "./BreedProfile";
 
@@ -18,7 +19,15 @@ const BreedList = ({
   selectedBreed,
   onAddBreed,
   onEditBreed,
+  onDeleteBreed,
 }) => {
+  // Extract the breeds array from the response object
+  const breedsArray = Array.isArray(breeds)
+    ? breeds
+    : breeds?.breeds?.length
+    ? breeds.breeds
+    : [];
+
   const [filters, setFilters] = useState({
     size: "",
     energyLevel: "",
@@ -31,17 +40,18 @@ const BreedList = ({
     setFilters((prev) => ({ ...prev, [name]: value === "all" ? "" : value }));
   };
 
-  const filteredBreeds = breeds
+  const filteredBreeds = breedsArray
     .filter(
       (breed) =>
         (!filters.size || breed.size === filters.size) &&
         (!filters.energyLevel || breed.energyLevel === filters.energyLevel) &&
-        (!filters.hypoallergenic ||
-          breed.hypoallergenic.toString() === filters.hypoallergenic)
+        (filters.hypoallergenic === "" ||
+          String(!!breed.hypoallergenic) === filters.hypoallergenic)
     )
     .sort((a, b) => {
-      if (sortBy === "alphabetical") return a.name.localeCompare(b.name);
-      return 0; // Add popularity sorting logic if needed
+      if (sortBy === "alphabetical")
+        return (a.name || "").localeCompare(b.name || "");
+      return 0; // Add popularity sort logic here if needed
     });
 
   return (
@@ -56,7 +66,10 @@ const BreedList = ({
               </Button>
             </DialogTrigger>
             <BreedForm
-              onSubmit={onAddBreed}
+              onSubmit={(newBreed) => {
+                onAddBreed?.(newBreed);
+                setIsAddOpen(false);
+              }}
               onClose={() => setIsAddOpen(false)}
             />
           </Dialog>
@@ -126,7 +139,7 @@ const BreedList = ({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Sort By
             </label>
-            <Select onValueChange={setSortBy}>
+            <Select onValueChange={setSortBy} defaultValue="alphabetical">
               <SelectTrigger className="w-48 bg-white">
                 <SelectValue placeholder="Sort By" />
               </SelectTrigger>
@@ -140,33 +153,96 @@ const BreedList = ({
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full">
+        <div className="w-full lg:flex-1">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">
             {filteredBreeds.length}{" "}
             {filteredBreeds.length === 1 ? "Breed" : "Breeds"} Found
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredBreeds.map((breed) => (
-              <BreedCard
-                key={breed.id}
-                breed={breed}
-                onSelect={() => onSelectBreed(breed)}
-                onEdit={(updatedBreed) => {
-                  onEditBreed(updatedBreed);
-                  if (selectedBreed?.id === updatedBreed.id) {
-                    onSelectBreed(updatedBreed);
-                  }
-                }}
-              />
-            ))}
-          </div>
+
+          {breedsArray.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl text-center">
+              <AlertCircle className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                No Breeds Available
+              </h3>
+              <p className="text-gray-500 max-w-md">
+                There are no dog breeds in the database yet. Click "Add Breed"
+                to create the first one.
+              </p>
+            </div>
+          ) : filteredBreeds.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl text-center">
+              <AlertCircle className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                No Results Found
+              </h3>
+              <p className="text-gray-500">
+                No breeds match your current filter settings. Try adjusting your
+                filters.
+              </p>
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={() =>
+                  setFilters({
+                    size: "",
+                    energyLevel: "",
+                    hypoallergenic: "",
+                  })
+                }
+              >
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredBreeds.map((breed) => (
+                <div
+                  key={breed._id || Math.random().toString()}
+                  className="relative group"
+                >
+                  <BreedCard
+                    breed={breed}
+                    onSelect={() => onSelectBreed?.(breed)}
+                    onEdit={(updatedBreed) => {
+                      console.log(
+                        "Bnnn:",
+                        updatedBreed
+                      );
+                      // Make sure we're passing the complete updated breed with its ID
+                      onEditBreed?.(updatedBreed);
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (
+                        window.confirm(
+                          `Are you sure you want to delete ${
+                            breed.name || "this breed"
+                          }?`
+                        )
+                      ) {
+                        onDeleteBreed?.(breed._id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {selectedBreed && (
           <div className="lg:w-1/2">
             <BreedProfile
               breed={selectedBreed}
-              onClose={() => onSelectBreed(null)}
+              onClose={() => onSelectBreed?.(null)}
             />
           </div>
         )}

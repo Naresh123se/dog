@@ -8,16 +8,29 @@ import BreedForm from "./BreedForm";
 const BreedCard = ({ breed, onSelect, onEdit }) => {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
 
+  const handleSubmit = (updatedBreed) => {
+    console.log("BreedCard received updated data:", updatedBreed);
+    // Make sure to spread the new data but keep the original ID
+    onEdit({
+      ...updatedBreed,
+      _id: breed._id,
+    });
+    setIsEditOpen(false);
+  };
+
   return (
     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
       <Card
         className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 rounded-xl overflow-hidden group relative"
-        onClick={onSelect}
+        onClick={() => onSelect(breed)}
       >
         <div className="relative">
           <CardHeader className="p-0">
             <img
-              src={breed.image}
+              src={
+                breed?.image ||
+                "https://via.placeholder.com/400x300?text=No+Image"
+              }
               alt={breed.name}
               className="w-full h-48 object-cover"
               loading="lazy"
@@ -49,7 +62,7 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
             <span>{breed.lifespan}</span>
           </div>
           <div className="mt-3 flex flex-wrap gap-1">
-            {breed.temperament.split(", ").map((trait, index) => (
+            {breed.temperament?.split(", ").map((trait, index) => (
               <span
                 key={index}
                 className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full"
@@ -61,14 +74,13 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
         </CardContent>
       </Card>
 
-      <BreedForm
-        breed={breed}
-        onSubmit={(data) => {
-          onEdit(data);
-          setIsEditOpen(false);
-        }}
-        onClose={() => setIsEditOpen(false)}
-      />
+      {isEditOpen && (
+        <BreedForm
+          breed={breed}
+          onSubmit={handleSubmit}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </Dialog>
   );
 };

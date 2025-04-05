@@ -21,11 +21,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-toastify"; // Import Toastify
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
   const location = useLocation(); // Hook to get current path
+
+  // Function to show toast message for integration notice
+  const showToast = () => {
+    toast.success("Food Integration soon!");
+  };
 
   // Function to scroll to section
   const scrollToSection = (sectionId) => {
@@ -37,7 +43,7 @@ const Nav = () => {
 
   // Define nav items with their paths and active colors
   const navItems = [
-    { path: "/dogs", label: "Dogs", activeClass: "text-[#018F98]" },
+    { path: "/", label: "Home", activeClass: "text-[#018F98]" },
     ...(location.pathname === "/"
       ? [
           {
@@ -49,7 +55,12 @@ const Nav = () => {
       : []),
     { path: "/breed", label: "Breeds", activeClass: "text-indigo-600" },
     { path: "/blog", label: "Blog", activeClass: "text-teal-500" },
-    { path: "/food", label: "Foods", activeClass: "text-green-600" },
+    {
+      // path: "/food",
+      label: "Foods",
+      activeClass: "text-green-600",
+      onClick: showToast,
+    }, // Added onClick for "Foods"
     { path: "/adoption", label: "Adoption", activeClass: "text-green-600" },
   ];
 
@@ -67,7 +78,7 @@ const Nav = () => {
               <NavLink
                 key={item.path}
                 to={item.path}
-                onClick={item.onClick} // Add onClick for scroll functionality
+                onClick={item.onClick} // Add onClick for toast functionality
                 className={({ isActive }) =>
                   `text-gray-700 hover:text-[#1DADC9] transition-colors ${
                     isActive && !item.onClick ? `${item.activeClass} ` : ""

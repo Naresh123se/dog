@@ -1,10 +1,17 @@
-// components/AddBlogForm.jsx
+// components/BlogForm.jsx
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Button } from "../ui/button";
 import { ImageIcon, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
+const BlogForm = ({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  defaultValues = null,
+  mode = "add" // 'add' or 'edit'
+}) => {
   const {
     register,
     handleSubmit,
@@ -12,14 +19,117 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
     formState: { errors },
   } = useForm();
 
-  const handleFormSubmit = async (data) => {
-    try {
-      await onSubmit(data);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (defaultValues) {
+      reset({
+        title: defaultValues.title,
+        author: defaultValues.author,
+        date: defaultValues.date?.split("T")[0],
+        category: defaultValues.category,
+        excerpt: defaultValues.excerpt,
+      });
+      
+      if (defaultValues.image) {
+        setImagePreviews([defaultValues.image]);
+      }
+    } else {
       reset();
-    } catch (error) {
-      toast.error("Failed to submit form");
+      setImagePreviews([]);
+      setImageFiles([]);
     }
-  };
+  }, [defaultValues, reset]);
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+const handleImageChange = (e) => {
+  const files = Array.from(e.target.files || []);
+  setErrorMessage("");
+
+  if (files.length === 0) {
+    setErrorMessage("Please select at least one image");
+    return;
+  }
+
+  // Filter valid images
+  const validImages = files.filter((file) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`Image ${file.name} exceeds 5MB limit`);
+      return false;
+    }
+    return true;
+  });
+
+  if (validImages.length === 0) {
+    setErrorMessage("Please upload at least one valid image");
+    return;
+  }
+
+  // Create previews and update state
+  validImages.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setImagePreviews((prev) => [...prev, reader.result]);
+        setImageFiles((prev) => [...prev, file]);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+const removeImage = (index) => {
+  setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  setImageFiles((prev) => prev.filter((_, i) => i !== index));
+
+  // Clear error if we have remaining images
+  if (imagePreviews.length > 1) {
+    setErrorMessage("");
+  }
+};
+
+const handleFormSubmit = async (data) => {
+    console.log(data)
+    console.log(imagePreviews)
+  try {
+    // Validate at least one image exists
+    if (imagePreviews.length === 0) {
+      setErrorMessage("Please upload at least one image");
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Append text fields
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // Append image files
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    // If editing and no new images, keep the existing image URL
+    if (
+      mode === "edit" &&
+      imageFiles.length === 0 &&
+      imagePreviews.length > 0
+    ) {
+      formData.append("existingImage", imagePreviews[0]);
+    }
+
+    await onSubmit(formData);
+    reset();
+    setImagePreviews([]);
+    setImageFiles([]);
+  } catch (error) {
+    toast.error("Failed to submit form");
+  }
+};
 
   if (!isOpen) return null;
 
@@ -28,7 +138,7 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
       <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900">
-            Add New Blog Post
+            {mode === "add" ? "Add New Blog Post" : "Edit Blog Post"}
           </h2>
           <button
             onClick={onClose}
@@ -105,9 +215,9 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
             )}
           </div>
 
-          <div className="w-[200px] space-y-4">
+          <div className="w-full space-y-4">
             <div className="space-y-2">
-              <Input
+              <input
                 id="photo"
                 type="file"
                 accept="image/*"
@@ -125,64 +235,37 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
                 Upload Image
               </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Max size: 5MB per
+                Max size: 5MB per image
               </p>
-            </div>
 
-            <div className="space-y-2">
-              {/* Display existing images */}
-              {existingImages?.map((preview, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    className="h-[120px] w-full object-cover rounded-md"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-6 w-6 rounded-full"
-                    onClick={() => removeImage(index, false)} // Remove existing image
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-
-              {/* Display new images */}
-              {imagePreviews?.map((preview, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    className="h-[120px] w-full object-cover rounded-md"
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-6 w-6 rounded-full"
-                    onClick={() => removeImage(index, true)} // Remove new image
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-
-              {/* Display placeholder if no images */}
-              {existingImages?.length === 0 && imagePreviews.length === 0 && (
-                <div className="h-[120px] w-full rounded-md border border-dashed border-gray-200 flex items-center justify-center">
-                  <div className="text-sm text-muted-foreground text-center p-4">
-                    <ImageIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No images uploaded</p>
+              {/* Image previews */}
+              <div className="grid grid-cols-3 gap-2">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img
+                      src={preview}
+                      alt={`Preview ${index}`}
+                      className="h-24 w-full object-cover rounded-md"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full"
+                      onClick={() => removeImage(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
-                </div>
+                ))}
+              </div>
+
+              {errorMessage && (
+                <p className="text-sm text-red-500 text-center">
+                  {errorMessage}
+                </p>
               )}
             </div>
-            {errorMessage && (
-              <p className="text-sm text-red-500 text-center">{errorMessage}</p>
-            )}
           </div>
 
           <div>
@@ -214,7 +297,7 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
-              Add Post
+              {mode === "add" ? "Add Post" : "Save Changes"}
             </button>
           </div>
         </form>
@@ -223,4 +306,4 @@ const AddBlogForm = ({ isOpen, onClose, onSubmit }) => {
   );
 };
 
-export default AddBlogForm;
+export default BlogForm;

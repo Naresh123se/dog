@@ -6,7 +6,7 @@ export const breedApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addBreed: builder.mutation({
       query: (data) => ({
-        url: `${breed_url}/`,
+        url: `${breed_url}/add-breed`,
         method: "POST",
         body: data,
         credentials: "include",
@@ -15,7 +15,7 @@ export const breedApiSlice = apiSlice.injectEndpoints({
 
     updateBreed: builder.mutation({
       query: (data) => ({
-        url: `${breed_url}/${data.id}`,
+        url: `${breed_url}/update-breed/${data.id}`,
         method: "PUT",
         body: data,
         credentials: "include",
@@ -24,7 +24,7 @@ export const breedApiSlice = apiSlice.injectEndpoints({
 
     getAllBreeds: builder.query({
       query: () => ({
-        url: `${breed_url}/`,
+        url: `${breed_url}/all-breeds`,
         method: "GET",
         credentials: "include",
       }),
@@ -32,7 +32,7 @@ export const breedApiSlice = apiSlice.injectEndpoints({
 
     getBreedById: builder.query({
       query: (id) => ({
-        url: `${breed_url}/${id}`,
+        url: `${breed_url}/breed/${id}`,
         method: "GET",
         credentials: "include",
       }),
@@ -48,7 +48,7 @@ export const breedApiSlice = apiSlice.injectEndpoints({
 
     deleteBreed: builder.mutation({
       query: (id) => ({
-        url: `${breed_url}/${id}`,
+        url: `${breed_url}/delete-breed/${id}`,
         method: "DELETE",
         credentials: "include",
       }),

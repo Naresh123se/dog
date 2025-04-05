@@ -8,7 +8,9 @@ class BlogController {
    * Create a new blog post
    */
   static createBlog = asyncHandler(async (req, res, next) => {
-    const { title, author, category, date, excerpt } = req.body;
+    const { title, author, category, date, images, excerpt } = req.body;
+    
+    console.log(req.body)
 
     const blog = await Blog.create({
       title,
@@ -16,7 +18,7 @@ class BlogController {
       category,
       date,
       excerpt,
-      image: "lll", // Placeholder; update with actual image handling
+      image: images, // Placeholder; update with actual image handling
     });
 
     return res.status(201).json({

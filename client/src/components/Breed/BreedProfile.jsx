@@ -10,13 +10,20 @@ import { ScrollArea } from "../ui/scroll-area";
 
 
 const BreedProfile = ({ breed, onClose }) => {
+  if (!breed) return null;
+
   return (
     <Dialog open={!!breed} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-4xl p-0 overflow-hidden rounded-lg">
+
+
         <ScrollArea className="h-[calc(100vh-100px)]">
           <div className="relative">
             <img
-              src={breed?.image}
+              src={
+                breed?.image ||
+                "https://via.placeholder.com/800x400?text=No+Image"
+              }
               alt={breed?.name}
               className="w-full h-64 object-cover"
             />
@@ -27,9 +34,9 @@ const BreedProfile = ({ breed, onClose }) => {
                   {breed?.name}
                 </DialogTitle>
                 <DialogDescription className="text-white/90 flex gap-2 items-center mt-1">
-                  <span>{breed?.origin}</span>
+                  <span>{breed?.origin || "Unknown origin"}</span>
                   <span>•</span>
-                  <span>{breed?.lifespan}</span>
+                  <span>{breed?.lifespan || "Unknown lifespan"}</span>
                 </DialogDescription>
               </DialogHeader>
             </div>
@@ -45,14 +52,16 @@ const BreedProfile = ({ breed, onClose }) => {
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Size:</span>
-                      <span className="font-medium">{breed?.size}</span>
+                      <span className="font-medium">
+                        {breed?.size || "Not specified"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
                         Temperament:
                       </span>
                       <span className="font-medium text-right">
-                        {breed?.temperament}
+                        {breed?.temperament || "Not specified"}
                       </span>
                     </div>
                   </CardContent>
@@ -67,7 +76,9 @@ const BreedProfile = ({ breed, onClose }) => {
                       <span className="text-muted-foreground">
                         Energy Level:
                       </span>
-                      <span className="font-medium">{breed?.energyLevel}</span>
+                      <span className="font-medium">
+                        {breed?.energyLevel || "Not specified"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
@@ -89,15 +100,21 @@ const BreedProfile = ({ breed, onClose }) => {
                   <CardContent className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Grooming:</span>
-                      <span className="font-medium">{breed?.grooming}</span>
+                      <span className="font-medium">
+                        {breed?.grooming || "Not specified"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Exercise:</span>
-                      <span className="font-medium">{breed?.exercise}</span>
+                      <span className="font-medium">
+                        {breed?.exercise || "Not specified"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Diet:</span>
-                      <span className="font-medium">{breed?.diet}</span>
+                      <span className="font-medium">
+                        {breed?.diet || "Not specified"}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -108,7 +125,7 @@ const BreedProfile = ({ breed, onClose }) => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">
-                      {breed?.healthIssues}
+                      {breed?.healthIssues || "No known health issues"}
                     </p>
                   </CardContent>
                 </Card>
