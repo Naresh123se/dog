@@ -10,6 +10,7 @@ class BlogController {
    */
   static createBlog = asyncHandler(async (req, res, next) => {
     const { title, author, category, date, images, excerpt } = req.body;
+    console.log(images);
 
     if (!images) {
       return next(new ErrorHandler("Atleast one image is required", 400));

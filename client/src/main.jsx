@@ -19,6 +19,7 @@ import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
 
 import { HomePage, UsersPage } from "./pages";
+import AddBlog from "./components/Blog/AddBlog";
 
 const router = createBrowserRouter([
   {
@@ -114,6 +115,14 @@ const router = createBrowserRouter([
             element: (
               <AuthLayout authentication={false}>
                 <Blog />
+              </AuthLayout>
+            ),
+          },
+          {
+            path: "add-blog",
+            element: (
+              <AuthLayout authentication={false}>
+                <AddBlog />
               </AuthLayout>
             ),
           },
