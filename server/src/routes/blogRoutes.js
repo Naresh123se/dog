@@ -6,10 +6,10 @@ import { isAuthenticated } from "../middlewares/auth.js";
 const blogRouter = express.Router();
 
 // ********************* BLOG MANAGEMENT ROUTES *********************
-blogRouter.post("/create-blog", isAuthenticated, BlogController.addBlog);
+blogRouter.post("/create-blog", isAuthenticated, BlogController.createBlog);
 
 blogRouter.get("/all-blogs", BlogController.getAllBlogs);
-blogRouter.get("/blog/:id", BlogController.getBlog);
+blogRouter.get("/blog/:id", BlogController.getBlogById);
 blogRouter.get(
   "/blogs-by-category/:category",
   BlogController.getBlogsByCategory

@@ -1,31 +1,52 @@
 import mongoose from "mongoose";
 
 const breedSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
-    required: [true, "Title is required"],
-    trim: true,
-    maxlength: [200, "Title cannot exceed 200 characters"],
+    required: [true, "Name is required"],
+    maxlength: [100, "Name cannot exceed 100 characters"],
   },
-  author: {
+  origin: {
     type: String,
-    required: [true, "Author is required"],
-    maxlength: [100, "Author name cannot exceed 100 characters"],
+    required: [true, "Origin is required"],
   },
-  category: {
+  diet: {
     type: String,
-    required: [true, "Category is required"],
-    enum: ["Training", "Health", "Adoption Stories", "Dog Care", "Breed Info"],
+    required: [true, "Diet is required"],
   },
-  date: {
-    type: Date,
-    required: [true, "Date is required"],
-    default: Date.now,
-  },
-  excerpt: {
+  energyLevel: {
     type: String,
-    required: [true, "Excerpt is required"],
-    maxlength: [300, "Excerpt cannot exceed 300 characters"],
+    enum: ["Low", "Medium", "High"],
+    required: [true, "Energy level is required"],
+  },
+  exercise: {
+    type: String,
+    required: [true, "Exercise info is required"],
+  },
+  grooming: {
+    type: String,
+    required: [true, "Grooming info is required"],
+  },
+  healthIssues: {
+    type: String,
+    required: [true, "Health issues info is required"],
+  },
+  hypoallergenic: {
+    type: Boolean,
+    required: [true, "Hypoallergenic field is required"],
+  },
+  lifespan: {
+    type: String,
+    required: [true, "Lifespan info is required"],
+  },
+  size: {
+    type: String,
+    enum: ["Small", "Medium", "Large"],
+    required: [true, "Size is required"],
+  },
+  temperament: {
+    type: String,
+    required: [true, "Temperament info is required"],
   },
   image: {
     type: String,

@@ -6,15 +6,34 @@ import ErrorHandler from "../utils/ErrorHandler.js";
 class BreedController {
   // Add new breed
   static addBreed = asyncHandler(async (req, res, next) => {
-    const { title, author, category, date, excerpt } = req.body;
+    const {
+      name,
+      origin,
+      diet,
+      energyLevel,
+      exercise,
+      grooming,
+      healthIssues,
+      hypoallergenic,
+      lifespan,
+      size,
+      temperament,
+      image,
+    } = req.body;
 
     const breed = await Breed.create({
-      title,
-      author,
-      category,
-      date,
-      excerpt,
-      image: req.file.path,
+      name,
+      origin,
+      diet,
+      energyLevel,
+      exercise,
+      grooming,
+      healthIssues,
+      hypoallergenic,
+      lifespan,
+      size,
+      temperament,
+      image,
     });
 
     res.status(201).json({
@@ -26,7 +45,7 @@ class BreedController {
 
   // Get all breeds
   static getAllBreeds = asyncHandler(async (req, res, next) => {
-    const breeds = await Breed.find().sort({ date: -1 });
+    const breeds = await Breed.find().sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -49,9 +68,24 @@ class BreedController {
     });
   });
 
-  // Update breed
   static updateBreed = asyncHandler(async (req, res, next) => {
-    const { title, author, category, date, excerpt } = req.body;
+    // Extract the data field from req.body
+    const {
+      name,
+      origin,
+      diet,
+      energyLevel,
+      exercise,
+      grooming,
+      healthIssues,
+      hypoallergenic,
+      lifespan,
+      size,
+      temperament,
+      image,
+    } = req.body?.data || {}; // Ensure the array is properly accessed
+
+ 
 
     let breed = await Breed.findById(req.params.id);
 
@@ -62,11 +96,17 @@ class BreedController {
     breed = await Breed.findByIdAndUpdate(
       req.params.id,
       {
-        title: title || breed.title,
-        author: author || breed.author,
-        category: category || breed.category,
-        date: date || breed.date,
-        excerpt: excerpt || breed.excerpt,
+        name: name || breed.name,
+        origin: origin || breed.origin,
+        diet: diet || breed.diet,
+        energyLevel: energyLevel || breed.energyLevel,
+        exercise: exercise || breed.exercise,
+        grooming: grooming || breed.grooming,
+        healthIssues: healthIssues || breed.healthIssues,
+        hypoallergenic: hypoallergenic || breed.hypoallergenic,
+        lifespan: lifespan || breed.lifespan,
+        size: size || breed.size,
+        temperament: temperament || breed.temperament,
         image: req.file?.path || breed.image,
       },
       {
@@ -75,7 +115,7 @@ class BreedController {
       }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Breed updated successfully",
       breed,
@@ -90,7 +130,7 @@ class BreedController {
       return next(new ErrorHandler("Breed not found", 404));
     }
 
-    await breed.remove();
+    await breed.deleteOne();
 
     res.status(200).json({
       success: true,
@@ -98,9 +138,9 @@ class BreedController {
     });
   });
 
-  // Get breeds by category
-  static getBreedsByCategory = asyncHandler(async (req, res, next) => {
-    const breeds = await Breed.find({ category: req.params.category });
+  // Get breeds by size
+  static getBreedsBySize = asyncHandler(async (req, res, next) => {
+    const breeds = await Breed.find({ size: req.params.size });
 
     res.status(200).json({
       success: true,

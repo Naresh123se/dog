@@ -4,8 +4,10 @@ import Blog from "../models/blogModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 
 class BlogController {
-  // Add new blog post
-  static addBlog = asyncHandler(async (req, res, next) => {
+  /**
+   * Create a new blog post
+   */
+  static createBlog = asyncHandler(async (req, res, next) => {
     const { title, author, category, date, excerpt } = req.body;
 
     const blog = await Blog.create({
@@ -14,44 +16,51 @@ class BlogController {
       category,
       date,
       excerpt,
-      image: "lll",
+      image: "lll", // Placeholder; update with actual image handling
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
-      message: "Blog post added successfully",
+      message: "Blog post created successfully",
       blog,
     });
   });
 
-  // Get all blog posts
+  /**
+   * Retrieve all blog posts
+   */
   static getAllBlogs = asyncHandler(async (req, res, next) => {
     const blogs = await Blog.find().sort({ date: -1 });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: blogs.length,
       blogs,
     });
   });
 
-  // Get single blog post
-  static getBlog = asyncHandler(async (req, res, next) => {
+  /**
+   * Retrieve a single blog post by ID
+   */
+  static getBlogById = asyncHandler(async (req, res, next) => {
     const blog = await Blog.findById(req.params.id);
 
     if (!blog) {
       return next(new ErrorHandler("Blog post not found", 404));
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       blog,
     });
   });
 
-  // Update blog post
+  /**
+   * Update an existing blog post
+   */
   static updateBlog = asyncHandler(async (req, res, next) => {
     const { title, author, category, date, excerpt } = req.body;
+    console.log(req.params.id);
 
     let blog = await Blog.findById(req.params.id);
 
@@ -75,14 +84,16 @@ class BlogController {
       }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Blog post updated successfully",
       blog,
     });
   });
 
-  // Delete blog post
+  /**
+   * Delete a blog post
+   */
   static deleteBlog = asyncHandler(async (req, res, next) => {
     const blog = await Blog.findById(req.params.id);
 
@@ -90,31 +101,37 @@ class BlogController {
       return next(new ErrorHandler("Blog post not found", 404));
     }
 
-    await blog.remove();
+      await blog.deleteOne();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Blog post deleted successfully",
     });
   });
 
-  // Get blog posts by category
+  /**
+   * Retrieve blog posts by category
+   */
   static getBlogsByCategory = asyncHandler(async (req, res, next) => {
     const blogs = await Blog.find({ category: req.params.category });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: blogs.length,
       blogs,
     });
   });
 
-  // Get featured/latest blog posts (additional useful method)
+  /**
+   * Retrieve featured or latest blog posts
+   * Query param: limit (default: 3)
+   */
   static getFeaturedBlogs = asyncHandler(async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 3;
+
     const blogs = await Blog.find().sort({ date: -1 }).limit(limit);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: blogs.length,
       blogs,
