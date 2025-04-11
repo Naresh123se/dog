@@ -6,14 +6,17 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Building2, Heart } from "lucide-react";
+import { MapPin, Building2 } from "lucide-react";
+import Contact from "./Contact";
+import { useSelector } from "react-redux";
 
-export const DogCard = ({ dog, onEdit, onFavorite }) => {
+export const DogCard = ({ dog, onEdit }) => {
   const getAgeColor = (age) => {
     if (age <= 1) return "bg-blue-100 text-blue-800";
     if (age <= 7) return "bg-green-100 text-green-800";
     return "bg-purple-100 text-purple-800";
   };
+  const user = useSelector((state) => state.auth.user?.role);
 
   return (
     <Card className="w-full max-w-sm mx-auto overflow-hidden shadow-lg rounded-xl hover:shadow-2xl transition-all duration-300 group">
@@ -40,14 +43,6 @@ export const DogCard = ({ dog, onEdit, onFavorite }) => {
               {dog.size}
             </Badge>
           </div>
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 bg-white/50 hover:bg-white/80 rounded-full w-10 h-10"
-            onClick={onFavorite}
-          >
-            <Heart className="w-5 h-5 text-red-500" />
-          </Button> */}
         </div>
 
         <CardHeader className="p-4 pb-2">
@@ -79,26 +74,21 @@ export const DogCard = ({ dog, onEdit, onFavorite }) => {
         </CardContent>
 
         <CardFooter className="p-4 pt-0 flex space-x-3">
+          {user === "breeder" && <Contact dogData={dog} />}
+
           <Button
             variant="outline"
-            className="flex-1 hover:bg-green-50 hover:border-green-300"
-            asChild
+            className="flex-1 hover:bg-blue-50 hover:border-blue-300"
+            onClick={onEdit}
           >
-            <a
-              href={`mailto:${dog.shelter.replace(
-                /\s+/g,
-                ""
-              )}@example.com?subject=Inquiry about ${dog.name}`}
-            >
-              Contact Shelter
-            </a>
+            Edit
           </Button>
           <Button
             variant="outline"
             className="flex-1 hover:bg-blue-50 hover:border-blue-300"
             onClick={onEdit}
           >
-            Edit Details
+            Edit
           </Button>
         </CardFooter>
       </div>

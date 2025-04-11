@@ -10,6 +10,10 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     category: {
       type: String,
       required: true,
@@ -19,6 +23,10 @@ const blogSchema = new mongoose.Schema(
       default: Date.now,
     },
     excerpt: {
+      type: String,
+      required: true,
+    },
+    content: {
       type: String,
       required: true,
     },

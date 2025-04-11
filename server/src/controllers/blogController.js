@@ -1,6 +1,7 @@
 // controllers/blogController.js
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Blog from "../models/blogModel.js";
+import User from "../models/userModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import cloudinary from "cloudinary";
 
@@ -9,8 +10,9 @@ class BlogController {
    * Create a new blog post
    */
   static createBlog = asyncHandler(async (req, res, next) => {
-    const { title, author, category, date, images, excerpt } = req.body;
-    console.log(images);
+    const { title, author, category, date, images, excerpt, content } =
+      req.body;
+    const user = await User.findOne({ _id: req.user._id });
 
     if (!images) {
       return next(new ErrorHandler("Atleast one image is required", 400));
@@ -36,7 +38,9 @@ class BlogController {
       category,
       date,
       excerpt,
-      images: imagesLinks, // Placeholder; update with actual image handling
+      content,
+      owner: user,
+      images: imagesLinks,
     });
 
     return res.status(201).json({
@@ -79,13 +83,38 @@ class BlogController {
    * Update an existing blog post
    */
   static updateBlog = asyncHandler(async (req, res, next) => {
-    const { title, author, category, date, excerpt } = req.body;
-    console.log(req.params.id);
+    const { title, author, category, date, excerpt, content } = req.body;
 
     let blog = await Blog.findById(req.params.id);
 
     if (!blog) {
       return next(new ErrorHandler("Blog post not found", 404));
+    }
+
+    // Handle Image section using cloudinary
+    let images = [];
+
+    // If images are passed as a string (for a single image)
+    if (typeof req.body.images === "string") {
+      images.push(req.body.images);
+    } else {
+      images = req.body.images;
+    }
+
+    // Now uploading the images to Cloudinary
+    const imagesLinks = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "blogs",
+        quality: "auto:best",
+        height: 600,
+      });
+
+      // Storing the image links and public_id
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
     }
 
     blog = await Blog.findByIdAndUpdate(
@@ -96,7 +125,8 @@ class BlogController {
         category: category || blog.category,
         date: date || blog.date,
         excerpt: excerpt || blog.excerpt,
-        image: req.file?.path || blog.image,
+        content: content || blog.content,
+        images: imagesLinks || blog.images,
       },
       {
         new: true,

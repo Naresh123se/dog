@@ -1,16 +1,17 @@
 import { Mail, MapPin, Phone, Dog } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <>
-      <footer className="bg-gray-900 text-white pt-16 pb-8">
+      <footer className="bg-gray-900 text-white pt-16 pb-8 px-10">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="flex items-center mb-6">
+              <Link to="/" className="flex items-center mb-6 text-[#018F98]">
                 <Dog className="w-8 h-8" />
                 <span className="ml-2 text-xl font-bold">PETS</span>
-              </div>
+              </Link>
               <p className="text-gray-400">
                 Your trusted companion in pet care, providing everything you
                 need for your furry friends.

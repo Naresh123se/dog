@@ -10,12 +10,10 @@ import createActivationToken from "../utils/activation.js";
 import { sendToken } from "../utils/jwt.js";
 import cloudinary from "cloudinary";
 
-
 class AuthController {
   static registration = asyncHandler(async (req, res, next) => {
     try {
       const { name, email, password, address, phone, gender } = req.body;
-      console.log(req.body);
 
       if (!name) {
         return next(new ErrorHandler("Name cannot be empty", 400));

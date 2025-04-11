@@ -122,6 +122,7 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
       });
       if (breed.images?.length) {
         setImagePreviews(breed.images);
+        setImagePreviews(breed.images.map((img) => img.url));
       }
     } else {
       reset({
@@ -188,7 +189,6 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
                   Max {MAX_IMAGES} images, 5MB each (JPEG, PNG)
                 </p>
               </div>
-
               {/* Image Previews */}
               <div className="space-y-2">
                 {imagePreviews.length > 0 ? (

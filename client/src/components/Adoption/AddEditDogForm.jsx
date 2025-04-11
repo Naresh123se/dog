@@ -42,7 +42,7 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
       age: "",
       breed: "",
       location: "",
-      shelter: "",
+      price: "",
       bio: "",
       photos: [], // Changed to array for multiple images
       gender: "male",
@@ -144,7 +144,7 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
         age: "",
         breed: "",
         location: "",
-        shelter: "",
+        price:"",
         bio: "",
         photos: [],
         gender: "male",
@@ -287,18 +287,20 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
             </div>
 
             <div>
-              <Label htmlFor="shelter">Shelter/Rescue *</Label>
+              <Label htmlFor="price">Price *</Label>
               <Input
-                id="shelter"
-                {...register("shelter", { required: "Shelter is required" })}
-                className={errors.shelter && "border-red-500"}
+                id="price"
+                {...register("price", { required: "Price is required" })}
+                className={errors.price && "border-red-500"}
               />
-              {errors.shelter && (
+              {errors.price && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.shelter.message}
+                  {errors.price.message}
                 </p>
               )}
             </div>
+
+
 
             <div>
               <Label htmlFor="bio">Bio</Label>

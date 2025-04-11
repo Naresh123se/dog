@@ -17,6 +17,8 @@ import {
 } from "@/app/slices/userApiSlice";
 import { toast } from "react-toastify";
 import { Button } from "./ui/button";
+import Nav from "./Header/Nav/Nav";
+import { Footer } from ".";
 
 function Profile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -185,191 +187,196 @@ function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-10 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Profile Header */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-          <div className="h-32 bg-gradient-to-r from-[#1E3A8A] to-[#3b1861]"></div>
-          <div className="relative px-6 pb-6">
-            <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20 sm:space-x-6">
-              <div className="relative group">
-                <img
-                  src={profile.avatar}
-                  alt={profile.name}
-                  className="w-44 h-44 rounded-full border-4 border-white shadow-lg object-cover"
-                />
-                {isEditing && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                    <Camera className="w-10 h-10 text-white" />
-                  </div>
-                )}
-              </div>
-              <div className="mt-6 sm:mt-0 text-center sm:text-left flex-1">
-                <div className="flex items-center justify-between">
-                  <div>
-                    {isEditing ? (
-                      <Controller
-                        name="name"
-                        control={control}
-                        rules={{ required: "Name is required" }}
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="text"
-                            className="text-3xl font-bold text-gray-900 border-b-2 border-indigo-500 focus:outline-none bg-transparent"
-                          />
-                        )}
+    <>
+      <Nav />
+      <div className="min-h-screen bg-gray-50 pt-10 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Profile Header */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+            <div className="h-32 bg-gradient-to-r from-[#1E3A8A] to-[#3b1861]"></div>
+            <div className="relative px-6 pb-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20 sm:space-x-6">
+                <div className="relative group">
+                  <img
+                    src={profile.avatar}
+                    alt={profile.name}
+                    className="w-44 h-44 rounded-full border-4 border-white shadow-lg object-cover"
+                  />
+                  {isEditing && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
                       />
-                    ) : (
-                      <h1 className="text-3xl font-bold text-gray-900">
-                        {profile.name}
-                      </h1>
-                    )}
-                    <div className="mt-2 flex items-center space-x-3">
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 capitalize">
-                        {profile.role}
-                      </span>
-                      <span className="text-gray-500">·</span>
-                      <span className="text-gray-500">
-                        Joined {new Date(profile.joinDate).toLocaleDateString()}
-                      </span>
+                      <Camera className="w-10 h-10 text-white" />
                     </div>
-                  </div>
-                  {!isEditing && (
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      className=" transition-colors duration-300 flex items-center space-x-2 shadow-md hover:shadow-lg"
-                    >
-                      <Edit2 className="w-5 h-5" />
-                      <span>Edit Profile</span>
-                    </Button>
                   )}
+                </div>
+                <div className="mt-6 sm:mt-0 text-center sm:text-left flex-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      {isEditing ? (
+                        <Controller
+                          name="name"
+                          control={control}
+                          rules={{ required: "Name is required" }}
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="text"
+                              className="text-3xl font-bold text-gray-900 border-b-2 border-indigo-500 focus:outline-none bg-transparent"
+                            />
+                          )}
+                        />
+                      ) : (
+                        <h1 className="text-3xl font-bold text-gray-900">
+                          {profile.name}
+                        </h1>
+                      )}
+                      <div className="mt-2 flex items-center space-x-3">
+                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 capitalize">
+                          {profile.role}
+                        </span>
+                        <span className="text-gray-500">·</span>
+                        <span className="text-gray-500">
+                          Joined{" "}
+                          {new Date(profile.joinDate).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    {!isEditing && (
+                      <Button
+                        onClick={() => setIsEditing(true)}
+                        className=" transition-colors duration-300 flex items-center space-x-2 shadow-md hover:shadow-lg"
+                      >
+                        <Edit2 className="w-5 h-5" />
+                        <span>Edit Profile</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 justify-center">
-          <StatCard
-            icon={BookOpen}
-            label="Total Journal Entries"
-            value={profile.journalStats.totalEntries}
-          />
-          <StatCard
-            icon={Users}
-            label="Total Groups"
-            value={profile.groupStats.totalGroups}
-          />
-        </div>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 justify-center">
+            <StatCard
+              icon={BookOpen}
+              label="Total Journal Entries"
+              value={profile.journalStats.totalEntries}
+            />
+            <StatCard
+              icon={Users}
+              label="Total Groups"
+              value={profile.groupStats.totalGroups}
+            />
+          </div>
 
-        {/* Profile Information */}
-        <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
-          {/* Contact Information */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              Contact Information
-            </h2>
-            <div className="space-y-6">
-              <InputField
-                icon={Mail}
-                label="Email Address"
-                name="email"
-                control={control}
-                rules={{
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "Invalid email address",
-                  },
-                }}
-                type="email"
-              />
-              <InputField
-                icon={Phone}
-                label="Phone Number"
-                name="phone"
-                control={control}
-                rules={{
-                  pattern: {
-                    value: /^\+?[0-9\s-]+$/,
-                    message: "Invalid phone number",
-                  },
-                }}
-              />
-              <InputField
-                icon={MapPin}
-                label="Address"
-                name="address"
-                control={control}
-              />
+          {/* Profile Information */}
+          <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
+            {/* Contact Information */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Contact Information
+              </h2>
+              <div className="space-y-6">
+                <InputField
+                  icon={Mail}
+                  label="Email Address"
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Invalid email address",
+                    },
+                  }}
+                  type="email"
+                />
+                <InputField
+                  icon={Phone}
+                  label="Phone Number"
+                  name="phone"
+                  control={control}
+                  rules={{
+                    pattern: {
+                      value: /^\+?[0-9\s-]+$/,
+                      message: "Invalid phone number",
+                    },
+                  }}
+                />
+                <InputField
+                  icon={MapPin}
+                  label="Address"
+                  name="address"
+                  control={control}
+                />
+              </div>
+            </div>
+
+            {/* Bio Section */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                About Me
+              </h2>
+              {isEditing ? (
+                <Controller
+                  name="bio"
+                  control={control}
+                  rules={{
+                    required: "Bio is required",
+                    maxLength: {
+                      value: 200,
+                      message: "Bio must be less than 200 characters",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <textarea
+                      {...field}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm"
+                      placeholder="Tell us about yourself..."
+                    />
+                  )}
+                />
+              ) : (
+                <p className="text-gray-600 leading-relaxed">{profile.bio}</p>
+              )}
             </div>
           </div>
 
-          {/* Bio Section */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              About Me
-            </h2>
-            {isEditing ? (
-              <Controller
-                name="bio"
-                control={control}
-                rules={{
-                  required: "Bio is required",
-                  maxLength: {
-                    value: 200,
-                    message: "Bio must be less than 200 characters",
-                  },
-                }}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm"
-                    placeholder="Tell us about yourself..."
-                  />
+          {/* Action Buttons */}
+          {isEditing && (
+            <div className="mt-8 flex justify-end space-x-4">
+              <button
+                onClick={handleCancel}
+                className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300"
+              >
+                <X className="w-5 h-5" />
+                <span>Cancel</span>
+              </button>
+              <button
+                onClick={handleSubmit(onSubmit)}
+                disabled={updateLoading}
+                className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 disabled:opacity-50"
+              >
+                <Check className="w-5 h-5" />
+                {updateLoading ? (
+                  <span>Saving...</span>
+                ) : (
+                  <span>Save Changes</span>
                 )}
-              />
-            ) : (
-              <p className="text-gray-600 leading-relaxed">{profile.bio}</p>
-            )}
-          </div>
+              </button>
+            </div>
+          )}
         </div>
-
-        {/* Action Buttons */}
-        {isEditing && (
-          <div className="mt-8 flex justify-end space-x-4">
-            <button
-              onClick={handleCancel}
-              className="flex items-center space-x-2 px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-300"
-            >
-              <X className="w-5 h-5" />
-              <span>Cancel</span>
-            </button>
-            <button
-              onClick={handleSubmit(onSubmit)}
-              disabled={updateLoading}
-              className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-300 disabled:opacity-50"
-            >
-              <Check className="w-5 h-5" />
-              {updateLoading ? (
-                <span>Saving...</span>
-              ) : (
-                <span>Save Changes</span>
-              )}
-            </button>
-          </div>
-        )}
       </div>
-    </div>
+      <Footer/>
+    </>
   );
 }
 

@@ -15,18 +15,20 @@ const BreedProfile = ({ breed, onClose }) => {
   return (
     <Dialog open={!!breed} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-4xl p-0 overflow-hidden rounded-lg">
-
-
         <ScrollArea className="h-[calc(100vh-100px)]">
           <div className="relative">
-            <img
-              src={
-                breed?.image ||
-                "https://via.placeholder.com/800x400?text=No+Image"
-              }
-              alt={breed?.name}
-              className="w-full h-64 object-cover"
-            />
+            {breed.images && breed.images.length > 0 ? (
+              <img
+                src={breed.images[0].url}
+                alt={breed.title}
+                className="w-full h-96 object-cover "
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-400">No image</span>
+              </div>
+            )}
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
               <DialogHeader>

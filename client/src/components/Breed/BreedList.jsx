@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import BreedCard from "./BreedCard";
 import BreedForm from "./BreedForm";
 import { Button } from "../ui/button";
@@ -12,6 +12,18 @@ import {
 } from "../ui/select";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import BreedProfile from "./BreedProfile";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { useSelector } from "react-redux";
 
 const BreedList = ({
   breeds,
@@ -20,6 +32,7 @@ const BreedList = ({
   onAddBreed,
   onEditBreed,
   onDeleteBreed,
+  deleteLoading,
 }) => {
   // Extract the breeds array from the response object
   const breedsArray = Array.isArray(breeds)
@@ -40,6 +53,12 @@ const BreedList = ({
     setFilters((prev) => ({ ...prev, [name]: value === "all" ? "" : value }));
   };
 
+  const user = useSelector((state) => state.auth?.user?.role);
+
+  // const isOwner = Array.isArray(breedsArray)
+  //   ? breedsArray.map((post) => post?.owner?._id === user?._id)
+  //   : false;
+
   const filteredBreeds = breedsArray
     .filter(
       (breed) =>
@@ -59,20 +78,22 @@ const BreedList = ({
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Filter Breeds</h2>
-          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Add Breed
-              </Button>
-            </DialogTrigger>
-            <BreedForm
-              onSubmit={(newBreed) => {
-                onAddBreed?.(newBreed);
-                setIsAddOpen(false);
-              }}
-              onClose={() => setIsAddOpen(false)}
-            />
-          </Dialog>
+          {user === "breeder" && (
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Add Breed
+                </Button>
+              </DialogTrigger>
+              <BreedForm
+                onSubmit={(newBreed) => {
+                  onAddBreed?.(newBreed);
+                  setIsAddOpen(false);
+                }}
+                onClose={() => setIsAddOpen(false)}
+              />
+            </Dialog>
+          )}
         </div>
         <div className="flex flex-wrap gap-4">
           <div>
@@ -197,41 +218,48 @@ const BreedList = ({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredBreeds.map((breed) => (
-                <div
-                  key={breed._id || Math.random().toString()}
-                  className="relative group"
-                >
+                <div key={breed._id} className="relative group">
                   <BreedCard
                     breed={breed}
                     onSelect={() => onSelectBreed?.(breed)}
                     onEdit={(updatedBreed) => {
-                      console.log(
-                        "Bnnn:",
-                        updatedBreed
-                      );
-                      // Make sure we're passing the complete updated breed with its ID
                       onEditBreed?.(updatedBreed);
                     }}
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (
-                        window.confirm(
-                          `Are you sure you want to delete ${
-                            breed.name || "this breed"
-                          }?`
-                        )
-                      ) {
-                        onDeleteBreed?.(breed._id);
-                      }
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+
+                  {breed?.owner?._id === user && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm rounded-full p-2"
+                          title="Delete Blog"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your blog post.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => onDeleteBreed(breed._id)}
+                            className="bg-red-600 hover:bg-red-700"
+                            disabled={deleteLoading}
+                          >
+                            {deleteLoading ? "Deleting..." : "Delete"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               ))}
             </div>

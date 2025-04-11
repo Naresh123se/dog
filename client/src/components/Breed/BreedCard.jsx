@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import BreedForm from "./BreedForm";
+import { useSelector } from "react-redux";
 
 const BreedCard = ({ breed, onSelect, onEdit }) => {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
@@ -16,7 +17,9 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
     setIsEditOpen(false);
   };
 
- { console.log(breed)}
+  const user = useSelector((state) => state.auth?.user);
+  const isOwner = breed?.owner?._id === user?._id;
+
   return (
     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
       <Card
@@ -39,17 +42,19 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
             )}
           </CardHeader>
           <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEditOpen(true);
-              }}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+            {isOwner && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 hover:bg-white backdrop-blur-sm rounded-full p-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditOpen(true);
+                }}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
           </DialogTrigger>
         </div>
         <CardContent className="p-4">

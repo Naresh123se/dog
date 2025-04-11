@@ -1,5 +1,4 @@
 import { useState } from "react";
-import BreedList from "./BreedList";
 import {
   useGetAllBreedsQuery,
   useAddBreedMutation,
@@ -7,12 +6,13 @@ import {
   useDeleteBreedMutation,
 } from "@/app/slices/breedApiSlice";
 import { toast } from "react-toastify";
+import BreedList from "./BreedList";
 
 const Breed = () => {
   const { data: breeds, isLoading, isError, refetch } = useGetAllBreedsQuery();
   const [addBreed] = useAddBreedMutation();
   const [updateBreed] = useUpdateBreedMutation();
-  const [deleteBreed] = useDeleteBreedMutation();
+  const [deleteBreed, { isLoading: deleteLoading }] = useDeleteBreedMutation();
   const [selectedBreed, setSelectedBreed] = useState(null);
 
   const handleAddBreed = async (newBreed) => {
@@ -77,6 +77,7 @@ const Breed = () => {
           onAddBreed={handleAddBreed}
           onEditBreed={handleEditBreed}
           onDeleteBreed={handleDeleteBreed}
+          deleteLoading={deleteLoading}
         />
       </main>
     </div>

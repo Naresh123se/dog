@@ -1,6 +1,7 @@
 // controllers/breedController.js
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Breed from "../models/breedModel.js";
+import User from "../models/userModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import cloudinary from "cloudinary";
 
@@ -19,12 +20,14 @@ class BreedController {
       lifespan,
       size,
       temperament,
-       images,
+      images,
     } = req.body;
 
     if (!images) {
       return next(new ErrorHandler("Atleast one image is required", 400));
     }
+
+   const user = await User.findOne({ _id: req.user._id });
 
     const imagesLinks = [];
     for (let i = 0; i < images.length; i++) {
@@ -53,6 +56,7 @@ class BreedController {
       size,
       temperament,
       images: imagesLinks,
+      owner: user,
     });
 
     res.status(201).json({
@@ -64,7 +68,7 @@ class BreedController {
 
   // Get all breeds
   static getAllBreeds = asyncHandler(async (req, res, next) => {
-    const breeds = await Breed.find().sort({ createdAt: -1 });
+    const breeds = await Breed.find().sort({ createdAt: -1 }).populate("owner", "_id");
 
     res.status(200).json({
       success: true,
@@ -101,13 +105,38 @@ class BreedController {
       lifespan,
       size,
       temperament,
-      image,
-    } = req.body?.data || {}; // Ensure the array is properly accessed
+      images: bodyImages, // Rename this to avoid conflict
+    } = req.body?.data || {};
 
     let breed = await Breed.findById(req.params.id);
 
     if (!breed) {
       return next(new ErrorHandler("Breed not found", 404));
+    }
+
+    // Handle Image section using cloudinary
+    let imagesToUpload = [];
+
+    // If images are passed as a string (for a single image)
+    if (typeof req.body.images === "string") {
+      imagesToUpload.push(req.body.images);
+    } else {
+      imagesToUpload = req.body.images || bodyImages || [];
+    }
+
+    // Now uploading the images to Cloudinary
+    const imagesLinks = [];
+    for (let i = 0; i < imagesToUpload.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(imagesToUpload[i], {
+        folder: "breeds",
+        quality: "auto:best",
+        height: 600,
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
     }
 
     breed = await Breed.findByIdAndUpdate(
@@ -124,7 +153,7 @@ class BreedController {
         lifespan: lifespan || breed.lifespan,
         size: size || breed.size,
         temperament: temperament || breed.temperament,
-        image: req.file?.path || breed.image,
+        images: imagesLinks.length > 0 ? imagesLinks : breed.images, // Fixed typo (blog.images -> breed.images)
       },
       {
         new: true,

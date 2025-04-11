@@ -4,6 +4,7 @@ import { FAQ } from "@/components/Home/FAQ";
 import { Hero } from "@/components/Home/Hero";
 import { AvailablePets } from "@/components/Home/Petcard";
 import { Services } from "@/components/Home/Services";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const HomePage = () => {
   return (
@@ -14,6 +15,7 @@ const HomePage = () => {
       <Services/>
       <FAQ />
       <Footer/>
+      <ScrollToTop/>
     </>
   );
 };

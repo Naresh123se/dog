@@ -1,18 +1,20 @@
 // controllers/dogController.js
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import Dog from "../models/dogModel.js";
+import User from "../models/userModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import cloudinary from "cloudinary";
 
 class DogController {
   // Add new dog
   static addDog = asyncHandler(async (req, res, next) => {
-    const { name, age, breed, location, shelter, bio, gender, size, photos } =
+    const { name, age, breed, location, price, bio, gender, size, photos } =
       req.body;
 
     if (!photos) {
       return next(new ErrorHandler("Atleast one image is required", 400));
     }
+    const breederName = await User.findOne({ _id: req.user._id });
 
     const imagesLinks = [];
     for (let i = 0; i < photos.length; i++) {
@@ -33,12 +35,13 @@ class DogController {
       age,
       breed,
       location,
-      shelter,
+      price,
       bio,
       gender,
+      breederName,
       size,
       photo: imagesLinks, // Assuming you're using file upload middleware
-    });   
+    });
 
     res.status(201).json({
       success: true,

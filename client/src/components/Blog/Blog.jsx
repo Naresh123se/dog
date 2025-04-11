@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { PenBoxIcon, PlusIcon } from "lucide-react";
-import { useGetAllBlogsQuery } from "@/app/slices/blogApiSlice";
+import { Trash2, PlusIcon, Pen } from "lucide-react";
+import {
+  useGetAllBlogsQuery,
+  useDeleteBlogMutation,
+} from "@/app/slices/blogApiSlice";
 import {
   Dialog,
   DialogContent,
@@ -10,20 +13,47 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import AddBlog from "./AddBlog";
 import EditBlog from "./EditBlog";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 function Blog() {
-  const { data, isLoading } = useGetAllBlogsQuery();
+  const { data, isLoading, refetch } = useGetAllBlogsQuery();
+  const [deleteBlog, { isDeleting }] = useDeleteBlogMutation();
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const blogPosts = Array.isArray(data?.blogs) ? data.blogs : [];
+  const user = useSelector((state) => state.auth.user?._id);
+
+  const isOwner = blogPosts.every((post) => post?.owner === user);
 
   const handleEditClick = (blog) => {
     setSelectedBlog(blog);
     setIsEditDialogOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteBlog(id).unwrap();
+      toast.success("Delete Sucesfully");
+      refetch();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -34,7 +64,6 @@ function Blog() {
             <div className="mb-8 flex justify-between">
               <div className="flex flex-col gap-1 mb-6">
                 <h1 className="text-3xl flex items-center gap-1 font-bold text-gray-900">
-
                   Blog Posts
                 </h1>
                 <p className="text-gray-500 mt-1">
@@ -86,13 +115,18 @@ function Blog() {
                   {blogPosts.map((post) => (
                     <article
                       key={post._id}
-                      className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                      className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative"
                     >
-                      {post.images && post.images.length > 0 ? (
+                      {post.images?.length > 0 ? (
                         <img
                           src={post.images[0].url}
                           alt={post.title}
                           className="w-full h-56 object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                              "https://via.placeholder.com/400x225?text=No+Image";
+                          }}
                         />
                       ) : (
                         <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
@@ -102,7 +136,7 @@ function Blog() {
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-3">
                           <span className="inline-block px-3 py-1 text-sm font-semibold text-white bg-blue-600 rounded-full">
-                            {post.category}
+                            {post.category || "Uncategorized"}
                           </span>
                           <span className="text-sm text-gray-500">
                             {new Date(post.createdAt).toLocaleDateString()}
@@ -112,19 +146,61 @@ function Blog() {
                           {post.title}
                         </h2>
                         <p className="text-gray-600 mb-4 line-clamp-3">
-                          {post.excerpt}
+                          {post.excerpt || "No excerpt provided"}
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-500 italic">
-                            By {post.author}
+                            By {post.author || "Unknown author"}
                           </span>
-                          <Button
-                            variant="ghost"
-                            onClick={() => handleEditClick(post)}
-                          >
-                            <PenBoxIcon className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
+
+                          {isOwner && (
+                            <div className="flex gap-2">
+                              <Button
+                                size="icon"
+                                className="w-8 h-8 text-gray-700 rounded-full shadow-lg bg-[#1DADC9] hover:bg-[#1DADC9]/90"
+                                title="Edit Blog"
+                                onClick={() => handleEditClick(post)}
+                              >
+                                <Pen className="w-4 h-4" />
+                              </Button>
+
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    size="icon"
+                                    variant="destructive"
+                                    className="w-8 h-8 rounded-full shadow-lg"
+                                    title="Delete Blog"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Are you sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will
+                                      permanently delete your blog post.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => handleDelete(post._id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                      disabled={isDeleting}
+                                    >
+                                      {isDeleting ? "Deleting..." : "Delete"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </article>

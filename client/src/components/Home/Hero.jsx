@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 
 export function Hero() {
+  const navigator = useNavigate();
   return (
     <section className="relative h-[80vh] overflow-hidden">
       <video
@@ -15,7 +17,7 @@ export function Hero() {
           type="video/mp4"
         />
       </video>
-      <div className="relative z-10 h-full bg-black bg-opacity-50">
+      <div className="relative z-10 h-full bg-black bg-opacity-50 px-10">
         <div className="container mx-auto px-4 h-full flex items-center">
           <div className="text-white max-w-2xl">
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
@@ -25,8 +27,11 @@ export function Hero() {
               Your trusted partner in providing exceptional care for your
               beloved pets
             </p>
-            <Button className="py-2 rounded-full  hover:bg-opacity-90 ">
-              Book Now
+            <Button
+              className="py-2 rounded-full  hover:bg-opacity-90"
+              onClick={() => navigator("/adoption")}
+            >
+              Adoption Now
             </Button>
           </div>
         </div>

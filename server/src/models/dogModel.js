@@ -18,14 +18,17 @@ const dogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  shelter: {
-    // Now just a string field
+  price: {
     type: String,
-    required: false, // Make optional if needed
+    required: true,
   },
   bio: {
     type: String,
     required: true,
+  },
+  breederName: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
   photo: [
     {
