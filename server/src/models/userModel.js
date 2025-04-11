@@ -51,15 +51,19 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
     role: {
       type: String,
-      enum: ["shop", "admin", "distributor"],
-      default: "shop",
+      enum: ["user", "breeder"],
+      default: "user",
       required: true,
     },
     avatar: {
       public_id: String,
       url: String,
+    },
+    bio: {
+      type: String,
     },
     paymentMethod: {
       type: String,

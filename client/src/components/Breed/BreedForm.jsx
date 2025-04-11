@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_IMAGES = 5; // Maximum number of images allowed
 
-const BreedForm = ({ breed, onSubmit, onClose }) => {
+const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -29,7 +29,7 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
     reset,
     setValue,
     watch,
-    formState: { isDirty },
+    formState: { isDirty, errors },
   } = useForm({
     defaultValues: {
       name: "",
@@ -47,54 +47,53 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
     },
   });
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files || []);
+ const handleImageChange = (e) => {
+   const files = Array.from(e.target.files || []);
 
-    if (files.length === 0) {
-      setErrorMessage("Please select at least one image.");
-      return;
-    }
+   if (files.length === 0) {
+     setErrorMessage("Please select at least one image.");
+     return;
+   }
+   // Check total images won't exceed limit
+   if (imagePreviews.length + files.length > MAX_IMAGES) {
+     setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
+     return;
+   }
 
-    // Check total images won't exceed limit
-    if (imagePreviews.length + files.length > MAX_IMAGES) {
-      setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
-      return;
-    }
+   // Validate file sizes
+   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+   if (oversizedFiles.length > 0) {
+     toast.error(`Some images exceed 5MB limit`);
+     return;
+   }
 
-    // Validate file sizes
-    const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
-    if (oversizedFiles.length > 0) {
-      toast.error(`Some images exceed 5MB limit`);
-      return;
-    }
+   setUploading(true);
+   setErrorMessage("");
 
-    setUploading(true);
-    setErrorMessage("");
+   // Process each file to base64
+   const promises = files.map((file) => {
+     return new Promise((resolve) => {
+       const reader = new FileReader();
+       reader.onload = () => resolve(reader.result);
+       reader.readAsDataURL(file);
+     });
+   });
 
-    // Process each file to base64
-    const promises = files.map((file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.all(promises)
-      .then((newBase64Images) => {
-        setImagePreviews((prev) => [...prev, ...newBase64Images]);
-        setValue("images", [...watch("images"), ...newBase64Images], {
-          shouldDirty: true,
-        });
-      })
-      .catch((error) => {
-        toast.error("Failed to process images");
-        console.error("Image processing error:", error);
-      })
-      .finally(() => {
-        setUploading(false);
-      });
-  };
+   Promise.all(promises)
+     .then((newBase64Images) => {
+       setImagePreviews((prev) => [...prev, ...newBase64Images]);
+       setValue("images", [...watch("images"), ...newBase64Images], {
+         shouldDirty: true,
+       });
+     })
+     .catch((error) => {
+       toast.error("Failed to process images");
+       console.error("Image processing error:", error);
+     })
+     .finally(() => {
+       setUploading(false);
+     });
+ };
 
   const removeImage = (index) => {
     const newPreviews = [...imagePreviews];
@@ -143,16 +142,21 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
     }
   }, [breed, reset]);
 
-  const onFormSubmit = (data) => {
-    const formattedData = {
-      ...data,
-      _id: breed?._id,
-      hypoallergenic:
-        data.hypoallergenic === true || data.hypoallergenic === "true",
-      // images array is already in the correct format (array of base64 strings)
-    };
-    onSubmit(formattedData);
+const onFormSubmit = (data) => {
+  if (imagePreviews.length === 0) {
+    setErrorMessage("At least one image is required");
+    return;
+  }
+
+  const formattedData = {
+    ...data,
+    _id: breed?._id,
+    hypoallergenic:
+      data.hypoallergenic === true || data.hypoallergenic === "true",
+    images: imagePreviews,
   };
+  onSubmit(formattedData);
+};
 
   return (
     <DialogContent className="sm:max-w-[625px]">
@@ -332,8 +336,36 @@ const BreedForm = ({ breed, onSubmit, onClose }) => {
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!isDirty}>
-                {breed ? "Save Changes" : "Add Breed"}
+              <Button type="submit" disabled={!isDirty || isLoading}>
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    {breed ? "Saving..." : "Adding..."}
+                  </span>
+                ) : breed ? (
+                  "Save Changes"
+                ) : (
+                  "Add Breed"
+                )}
               </Button>
             </div>
           </div>

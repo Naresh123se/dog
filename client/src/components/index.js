@@ -11,6 +11,8 @@ import Breed from "./Breed/Breed";
 import AdoptionPortal from "./Adoption/AdoptionPortal";
 import ContentLibrary from "./Article/ContentLibrary";
 import Profile from "./Profile";
+import AdminSidebar from "./Admin/AdminSidebar";
+import AdminNavbar from "./Admin/AdminNavbar";
 
 export {
   Login,
@@ -25,5 +27,7 @@ export {
   AdoptionPortal,
   ContentLibrary,
   Profile,
+  AdminSidebar,
+  AdminNavbar,
   Footer,
 };

@@ -20,6 +20,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useEffect, useState } from "react";
 import { ImageIcon, X } from "lucide-react";
 import { toast } from "react-toastify";
+import { color } from "framer-motion";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_IMAGES = 5; // Maximum number of images allowed
@@ -47,6 +48,7 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
       photos: [], // Changed to array for multiple images
       gender: "male",
       size: "Medium",
+      color: "",
     },
   });
 
@@ -144,11 +146,12 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
         age: "",
         breed: "",
         location: "",
-        price:"",
+        price: "",
         bio: "",
         photos: [],
         gender: "male",
         size: "Medium",
+        color: "",
       });
       setImagePreviews([]);
     }
@@ -299,8 +302,6 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
                 </p>
               )}
             </div>
-
-
 
             <div>
               <Label htmlFor="bio">Bio</Label>

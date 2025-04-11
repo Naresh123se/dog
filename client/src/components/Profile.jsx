@@ -261,20 +261,6 @@ function Profile() {
             </div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 justify-center">
-            <StatCard
-              icon={BookOpen}
-              label="Total Journal Entries"
-              value={profile.journalStats.totalEntries}
-            />
-            <StatCard
-              icon={Users}
-              label="Total Groups"
-              value={profile.groupStats.totalGroups}
-            />
-          </div>
-
           {/* Profile Information */}
           <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
             {/* Contact Information */}
@@ -375,7 +361,7 @@ function Profile() {
           )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }

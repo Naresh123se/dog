@@ -33,6 +33,7 @@ const BreedList = ({
   onEditBreed,
   onDeleteBreed,
   deleteLoading,
+  addLoading
 }) => {
   // Extract the breeds array from the response object
   const breedsArray = Array.isArray(breeds)
@@ -55,10 +56,7 @@ const BreedList = ({
 
   const user = useSelector((state) => state.auth?.user?.role);
 
-  // const isOwner = Array.isArray(breedsArray)
-  //   ? breedsArray.map((post) => post?.owner?._id === user?._id)
-  //   : false;
-
+ 
   const filteredBreeds = breedsArray
     .filter(
       (breed) =>
@@ -79,6 +77,7 @@ const BreedList = ({
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Filter Breeds</h2>
           {user === "breeder" && (
+            // In the Dialog for Add Breed:
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -86,11 +85,14 @@ const BreedList = ({
                 </Button>
               </DialogTrigger>
               <BreedForm
-                onSubmit={(newBreed) => {
-                  onAddBreed?.(newBreed);
-                  setIsAddOpen(false);
+                onSubmit={async (newBreed) => {
+                  const success = await onAddBreed?.(newBreed);
+                  if (success) {
+                    setIsAddOpen(false);
+                  }
                 }}
                 onClose={() => setIsAddOpen(false)}
+                isLoading={addLoading}
               />
             </Dialog>
           )}

@@ -28,7 +28,7 @@ const Login = () => {
       const res = await storeLogin(data).unwrap();
 
       dispatch(setCredentials({ user: res.user }));
-      if (res.user.role === "shop") {
+      if (res.user.role === "user" || res.user.role === "breeder") {
         navigate("/");
       } else if (res.user.role === "admin") {
         navigate("/admin");

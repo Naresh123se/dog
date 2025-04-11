@@ -37,9 +37,9 @@ function Blog() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const blogPosts = Array.isArray(data?.blogs) ? data.blogs : [];
-  const user = useSelector((state) => state.auth.user?._id);
+  const user = useSelector((state) => state.auth.user);
 
-  const isOwner = blogPosts.every((post) => post?.owner === user);
+  const isOwner = blogPosts.every((post) => post?.owner === user?._id);
 
   const handleEditClick = (blog) => {
     setSelectedBlog(blog);
@@ -70,21 +70,25 @@ function Blog() {
                   Latest articles and updates
                 </p>
               </div>
-
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-[#2F71F0] hover:bg-[#2F71F0]/90 text-white px-8">
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Add Blog Post
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Add New Blog Post</DialogTitle>
-                  </DialogHeader>
-                  <AddBlog onSuccess={() => setIsAddDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
+              {user?.role === "breeder" && (
+                <Dialog
+                  open={isAddDialogOpen}
+                  onOpenChange={setIsAddDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button className="bg-[#2F71F0] hover:bg-[#2F71F0]/90 text-white px-8">
+                      <PlusIcon className="mr-2 h-4 w-4" />
+                      Add Blog Post
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Add New Blog Post</DialogTitle>
+                    </DialogHeader>
+                    <AddBlog onSuccess={() => setIsAddDialogOpen(false)} />
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
 
             <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
@@ -102,13 +106,15 @@ function Blog() {
                   <p className="text-gray-600 mb-6">
                     Start by adding your first blog post!
                   </p>
-                  <Button
-                    onClick={() => setIsAddDialogOpen(true)}
-                    className="bg-[#2F71F0] hover:bg-[#2F71F0]/90 text-white px-8"
-                  >
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Add Blog Post
-                  </Button>
+                  {user?.role === "breeder" && (
+                    <Button
+                      onClick={() => setIsAddDialogOpen(true)}
+                      className="bg-[#2F71F0] hover:bg-[#2F71F0]/90 text-white px-8"
+                    >
+                      <PlusIcon className="mr-2 h-4 w-4" />
+                      Add Blog Post
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

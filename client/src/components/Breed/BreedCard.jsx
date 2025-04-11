@@ -6,19 +6,23 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 import BreedForm from "./BreedForm";
 import { useSelector } from "react-redux";
 
-const BreedCard = ({ breed, onSelect, onEdit }) => {
+const BreedCard = ({ breed, onSelect, onEdit, isLoading }) => {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
 
-  const handleSubmit = (updatedBreed) => {
-    onEdit({
+  const handleSubmit = async (updatedBreed) => {
+    const success = await onEdit({
       ...updatedBreed,
       _id: breed._id,
     });
-    setIsEditOpen(false);
+    if (success) {
+      setIsEditOpen(false);
+    }
   };
 
   const user = useSelector((state) => state.auth?.user);
+  console.log(user)
   const isOwner = breed?.owner?._id === user?._id;
+  console.log(isOwner)
 
   return (
     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
@@ -86,6 +90,7 @@ const BreedCard = ({ breed, onSelect, onEdit }) => {
           breed={breed}
           onSubmit={handleSubmit}
           onClose={() => setIsEditOpen(false)}
+          isLoading={isLoading}
         />
       )}
     </Dialog>

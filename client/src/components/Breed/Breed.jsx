@@ -10,8 +10,8 @@ import BreedList from "./BreedList";
 
 const Breed = () => {
   const { data: breeds, isLoading, isError, refetch } = useGetAllBreedsQuery();
-  const [addBreed] = useAddBreedMutation();
-  const [updateBreed] = useUpdateBreedMutation();
+  const [addBreed, { isLoading: addLoading }] = useAddBreedMutation();
+  const [updateBreed, { isLoading: updateLoading }] = useUpdateBreedMutation();
   const [deleteBreed, { isLoading: deleteLoading }] = useDeleteBreedMutation();
   const [selectedBreed, setSelectedBreed] = useState(null);
 
@@ -20,9 +20,11 @@ const Breed = () => {
       await addBreed(newBreed).unwrap();
       toast.success("Breed added successfully");
       refetch();
+      return true; // Return success status
     } catch (err) {
       toast.error("Failed to add breed");
       console.error("Failed to add breed:", err);
+      return false; // Return failure status
     }
   };
 
@@ -37,9 +39,11 @@ const Breed = () => {
         setSelectedBreed(updatedBreed);
       }
       refetch();
+      return true;
     } catch (err) {
       toast.error("Failed to update breed");
       console.error("Failed to update breed:", err);
+      return false;
     }
   };
 
@@ -51,9 +55,11 @@ const Breed = () => {
       if (selectedBreed?._id === id) {
         setSelectedBreed(null);
       }
+      return true;
     } catch (err) {
       toast.error("Failed to delete breed");
       console.error("Failed to delete breed:", err);
+      return false;
     }
   };
 
@@ -78,6 +84,7 @@ const Breed = () => {
           onEditBreed={handleEditBreed}
           onDeleteBreed={handleDeleteBreed}
           deleteLoading={deleteLoading}
+          addLoading={addLoading}
         />
       </main>
     </div>

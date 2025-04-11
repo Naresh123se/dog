@@ -18,8 +18,9 @@ import {
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
 
-import { HomePage, UsersPage } from "./pages";
+import { AdminDashboardPage, HomePage, UsersPage } from "./pages";
 import AddBlog from "./components/Blog/AddBlog";
+import AdminDashboard from "./components/Admin/AdminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -142,6 +143,17 @@ const router = createBrowserRouter([
           //   path: "edit-product/:id",
           //   element: <EditProduct />,
           // },
+        ],
+      },
+
+      {
+        path: "/admin",
+        element: <AdminDashboardPage />,
+        children: [
+          {
+            index: true,
+            element: <AdminDashboard />,
+          },
         ],
       },
     ],

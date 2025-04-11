@@ -22,9 +22,9 @@ import {
   CheckCircle,
   Calendar,
   Shield,
-  IndianRupee,
 } from "lucide-react";
-import { PawPrint, BadgeDollarSign } from "lucide-react";
+import { PawPrint } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function Contact({ dogData }) {
   // This would be passed from parent component
@@ -36,6 +36,8 @@ export default function Contact({ dogData }) {
     price: 1200,
     breederName: "Sarah Johnson",
   };
+
+  const user = useSelector((state) => state.auth?.user?.role);
 
   const [formStep, setFormStep] = useState("contact");
   const [submitted, setSubmitted] = useState(false);
@@ -69,7 +71,6 @@ export default function Contact({ dogData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Process the form submission and payment here
-    console.log("Form submitted:", formData);
     setSubmitted(true);
   };
 
@@ -91,9 +92,11 @@ export default function Contact({ dogData }) {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button className=" w-full">Contact & Adopt</Button>
-      </DialogTrigger>
+      {user === "user" && (
+        <DialogTrigger asChild>
+          <Button className=" w-full">Contact & Adopt</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         {!submitted ? (
           <>

@@ -12,6 +12,7 @@ import {
   useUpdateDogMutation,
 } from "@/app/slices/dogApiSlice";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const AdoptionPortal = () => {
   const {
@@ -30,6 +31,8 @@ const AdoptionPortal = () => {
     size: "",
     location: "",
   });
+
+  const user = useSelector((state) => state.auth?.user?.role);
 
   const [addDog, { isLoading: isAdding }] = useAddDogMutation();
   const [updateDog, { isLoading: isUpdating }] = useUpdateDogMutation();
@@ -176,16 +179,18 @@ const AdoptionPortal = () => {
               Browse our selection of dogs waiting for their forever homes
             </p>
           </div>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => {
-              setEditDog(null);
-              setShowForm(true);
-            }}
-            disabled={isAdding || isUpdating}
-          >
-            Add New Dog
-          </Button>
+          {user === "breeder" && (
+            <Button
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => {
+                setEditDog(null);
+                setShowForm(true);
+              }}
+              disabled={isAdding || isUpdating}
+            >
+              Add New Dog
+            </Button>
+          )}
         </div>
         <div className="text-center py-12">
           <svg
@@ -234,16 +239,18 @@ const AdoptionPortal = () => {
             Browse our selection of dogs waiting for their forever homes
           </p>
         </div>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700"
-          onClick={() => {
-            setEditDog(null);
-            setShowForm(true);
-          }}
-          disabled={isAdding || isUpdating}
-        >
-          Add New Dog
-        </Button>
+        {user === "breeder" && (
+          <Button
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={() => {
+              setEditDog(null);
+              setShowForm(true);
+            }}
+            disabled={isAdding || isUpdating}
+          >
+            Add New Dog
+          </Button>
+        )}
       </div>
 
       <div className="mb-8">

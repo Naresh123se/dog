@@ -310,7 +310,45 @@ const Register = () => {
                 </p>
               )}
             </div>
-
+            <div>
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
+                Are you a breeder?
+              </Label>
+              <Controller
+                name="isBreeder"
+                control={control}
+                rules={{ required: "This field is required" }}
+                render={({ field }) => (
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        value="yes"
+                        checked={field.value === "yes"}
+                        onChange={() => field.onChange("yes")}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="radio"
+                        value="no"
+                        checked={field.value === "no"}
+                        onChange={() => field.onChange("no")}
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">No</span>
+                    </label>
+                  </div>
+                )}
+              />
+              {errors.isBreeder && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.isBreeder.message}
+                </p>
+              )}
+            </div>
             {/* Submit Button */}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating Account..." : "Create account"}
