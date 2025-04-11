@@ -103,7 +103,7 @@ class DogController {
       return next(new ErrorHandler("Dog not found", 404));
     }
 
-    await dog.remove();
+    await Dog.deleteOne({ _id: req.params.id });
 
     res.status(200).json({
       success: true,

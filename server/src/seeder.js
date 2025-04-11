@@ -8,8 +8,8 @@ const createAdmin = asyncHandler(async (req, res, next) => {
     await connectDB();
 
     // Create the admin of the site
-    const email = "admin@distro.com"; // Replace with your email
-    const password = "admin@123";
+    const email = "admin@pets.com"; // Replace with your email
+    const password = "pets@123";
     const name = "Admin";
     // Check if an admin already exists
     const existingAdmin = await User.findOne({ email });
@@ -22,6 +22,7 @@ const createAdmin = asyncHandler(async (req, res, next) => {
       name,
       email,
       password,
+      gender:"male",
       phone:"9829192922",
       address:"kalopul, ktm",
       role: "admin",
