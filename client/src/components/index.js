@@ -13,6 +13,10 @@ import ContentLibrary from "./Article/ContentLibrary";
 import Profile from "./Profile";
 import AdminSidebar from "./Admin/AdminSidebar";
 import AdminNavbar from "./Admin/AdminNavbar";
+import AdminBlogs from "./Admin/AdminBlogs";
+import AdminBreeds from "./Admin/AdminBreeds";
+import AdminDogs from "./Admin/AdminDogs";
+import AdminUsers from "./Admin/AdminUsers";
 
 export {
   Login,
@@ -27,7 +31,12 @@ export {
   AdoptionPortal,
   ContentLibrary,
   Profile,
+  Footer,
+  // admin
   AdminSidebar,
   AdminNavbar,
-  Footer,
+  AdminBlogs,
+  AdminBreeds,
+  AdminDogs,
+  AdminUsers,
 };

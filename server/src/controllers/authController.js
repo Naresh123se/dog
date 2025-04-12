@@ -144,9 +144,14 @@ class AuthController {
         );
       }
       const user = await User.findOne({ email }).select("+password");
+      console.log(user)
 
       if (!user) {
         return next(new ErrorHandler("Invalid Email or Password", 400));
+      }
+
+      if (user?.isBanned) {
+        return next(new ErrorHandler("You are banned from the site", 400));
       }
 
       const isPasswordMatch = await user.comparePassword(password);

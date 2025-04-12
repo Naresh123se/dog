@@ -26,11 +26,11 @@ const SideBar = () => {
       label: "Dashboard",
       href: "/admin",
     },
-    { icon: NotebookPen, label: "My Journal", href: "/admin/journal" },
-    // { icon: NotebookTabs, label: "Explore Journal", href: "/journals" },
-    // { icon: UsersRound, label: "Group", href: "/groups" },
-    // { icon: PieChart, label: "Reports", href: "/reports" },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
+
+    { icon: NotebookPen, label: "Users", href: "/admin/users" },
+    { icon: NotebookTabs, label: "Blogs", href: "/admin/blogs" },
+    { icon: UsersRound, label: "Adoption", href: "/admin/dogs" },
+    { icon: PieChart, label: "Breeds", href: "/admin/breeds" },
   ];
 
   return (

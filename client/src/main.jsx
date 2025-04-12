@@ -14,9 +14,14 @@ import {
   ContentLibrary,
   Profile,
   Blog,
+  AdminBlogs,
+  AdminBreeds,
+  AdminDogs,
+  AdminUsers,
 } from "./components";
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
+import AdminLayout from "./routes/AdminLayout";
 
 import { AdminDashboardPage, HomePage, UsersPage } from "./pages";
 import AddBlog from "./components/Blog/AddBlog";
@@ -128,7 +133,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: "/adoption",
+            path: "adoption",
             element: (
               <AuthLayout authentication={false}>
                 <AdoptionPortal />
@@ -153,6 +158,38 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <AdminDashboard />,
+          },
+          {
+            path: "blogs",
+            element: (
+              <AdminLayout authentication={true}>
+                <AdminBlogs />
+              </AdminLayout>
+            ),
+          },
+          {
+            path: "breeds",
+            element: (
+              <AdminLayout authentication={true}>
+                <AdminBreeds />
+              </AdminLayout>
+            ),
+          },
+          {
+            path: "dogs",
+            element: (
+              <AdminLayout authentication={true}>
+                <AdminDogs />
+              </AdminLayout>
+            ),
+          },
+          {
+            path: "users",
+            element: (
+              <AdminLayout authentication={true}>
+                <AdminUsers />
+              </AdminLayout>
+            ),
           },
         ],
       },

@@ -49,7 +49,7 @@ const dogSchema = new mongoose.Schema({
   },
   size: {
     type: String,
-    enum: ["Small", "Medium", "Large", "Extra Large"],
+    enum: ["Small", "Medium", "Large", "X-Large"],
     default: "Medium",
   },
   // Other fields as needed...

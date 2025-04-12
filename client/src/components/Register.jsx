@@ -14,6 +14,7 @@ import {
   PhoneCall,
   Package,
   MapPinHouse,
+  Dog,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -69,8 +70,8 @@ const Register = () => {
         <div className="absolute inset-0 flex items-top justify-center p-12">
           <div className="text-white space-y-6 max-w-xl">
             <div className="flex items-center gap-3">
-              <Package size={40} className="text-[#0EA5E9]" />
-              <h1 className="text-3xl font-bold">DMS</h1>
+              <Dog size={40} className="text-[#c8d2d6]" />
+              <h1 className="text-3xl font-bold">Pets</h1>
             </div>
           </div>
         </div>

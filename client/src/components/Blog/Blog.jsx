@@ -38,8 +38,8 @@ function Blog() {
 
   const blogPosts = Array.isArray(data?.blogs) ? data.blogs : [];
   const user = useSelector((state) => state.auth.user);
-
-  const isOwner = blogPosts.every((post) => post?.owner === user?._id);
+console.log(blogPosts)
+  const isOwner = blogPosts.map((post) => post?.owner === user?._id);
 
   const handleEditClick = (blog) => {
     setSelectedBlog(blog);

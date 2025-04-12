@@ -3,7 +3,6 @@ import {
   LogIn,
   Menu,
   Search,
-  Settings,
   UserCircle,
   UserPlus,
   X,
@@ -20,7 +19,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify"; // Import Toastify
 
 const Nav = () => {
@@ -213,14 +211,7 @@ const Nav = () => {
                     <UserCircle className="h-5 w-5 mr-2" />
                     Profile
                   </Link>
-                  <Link
-                    to="/settings"
-                    className="text-gray-700 hover:bg-[#1E3A8A]/90 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Settings className="h-5 w-5 mr-2" />
-                    Settings
-                  </Link>
+
                   <LogoutButton className="bg-no w-full justify-start text-red-600 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/50" />
                 </div>
               )}

@@ -54,7 +54,7 @@ const BreedList = ({
     setFilters((prev) => ({ ...prev, [name]: value === "all" ? "" : value }));
   };
 
-  const user = useSelector((state) => state.auth?.user?.role);
+  const user = useSelector((state) => state.auth?.user);
 
  
   const filteredBreeds = breedsArray
@@ -76,7 +76,7 @@ const BreedList = ({
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">Filter Breeds</h2>
-          {user === "breeder" && (
+          {user?.role === "breeder" && (
             // In the Dialog for Add Breed:
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
               <DialogTrigger asChild>
@@ -229,7 +229,7 @@ const BreedList = ({
                     }}
                   />
 
-                  {breed?.owner?._id === user && (
+                  {breed?.owner?._id === user?._id && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button

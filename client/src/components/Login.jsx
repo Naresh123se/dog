@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { setCredentials } from "../app/slices/authSlice";
 import { useLoginMutation } from "../app/slices/userApiSlice";
-import { Eye, EyeOff, Mail, Package, Lock, User } from "lucide-react"; // Added missing imports
+import { Eye, EyeOff, Mail, Package, Lock, User, Dog } from "lucide-react"; // Added missing imports
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -26,18 +26,17 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const res = await storeLogin(data).unwrap();
-
-      dispatch(setCredentials({ user: res.user }));
-      if (res.user.role === "user" || res.user.role === "breeder") {
-        navigate("/");
-      } else if (res.user.role === "admin") {
-        navigate("/admin");
-      } else if (res.user.role === "distributor") {
-        navigate("/distributor");
+      if (res.success) {
+        dispatch(setCredentials({ user: res.user }));
+        if (res.user.role === "user" || res.user.role === "breeder") {
+          navigate("/");
+        } else if (res.user.role === "admin") {
+          navigate("/admin");
+        }
+        toast.success("Login Successful");
       }
-      toast.success("Login Successful");
     } catch (error) {
-      toast.error("Invalid Email or Password");
+      toast.error(error?.data?.message || "Invalid Email or Password");
       console.log(error);
     }
   };
@@ -55,8 +54,8 @@ const Login = () => {
         <div className="absolute inset-0 flex items-top justify-center p-12">
           <div className="text-white space-y-6 max-w-xl">
             <div className="flex items-center gap-3">
-              <Package size={40} className="text-[#0EA5E9]" />
-              <h1 className="text-3xl font-bold">DMS</h1>
+              <Dog size={40} className="text-[#aab4b8]" />
+              <h1 className="text-3xl font-bold">Pets</h1>
             </div>
           </div>
         </div>

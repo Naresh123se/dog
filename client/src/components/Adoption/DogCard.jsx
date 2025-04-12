@@ -17,9 +17,16 @@ import {
 import { MapPin, Building2 } from "lucide-react";
 import Contact from "./Contact";
 import { useSelector } from "react-redux";
+import {
+  useDeleteDogMutation,
+  useGetAllDogsQuery,
+} from "@/app/slices/dogApiSlice";
+import { toast } from "react-toastify";
 
-export const DogCard = ({ dog, onEdit, onDelete }) => {
+export const DogCard = ({ dog, onEdit }) => {
   const [open, setOpen] = useState(false);
+  const [del] = useDeleteDogMutation();
+  const { refetch } = useGetAllDogsQuery();
 
   const getAgeColor = (age) => {
     if (age <= 1) return "bg-blue-100 text-blue-800";
@@ -29,7 +36,24 @@ export const DogCard = ({ dog, onEdit, onDelete }) => {
 
   const user = useSelector((state) => state.auth?.user);
   const isOwner = dog?.breederName === user?._id;
+  const onDelete = async () => {
+    
+    if (!window.confirm("Are you sure you want to delete this dog?")) {
+      return false;
+    }
 
+    try {
+      await del(dog._id).unwrap();
+      toast.success("Dog deleted successfully");
+      refetch();
+      setOpen(false); // Close the dialog if open
+      return true;
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to delete dog");
+      console.error("Failed to delete dog:", err);
+      return false;
+    }
+  };
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -104,7 +128,7 @@ export const DogCard = ({ dog, onEdit, onDelete }) => {
                       className="flex-1 hover:bg-red-50 hover:border-red-300"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDelete();
+                        onDelete(e);
                       }}
                     >
                       Delete
@@ -245,7 +269,6 @@ export const DogCard = ({ dog, onEdit, onDelete }) => {
                       <td className="py-3 px-4 font-semibold text-gray-900">
                         {dog.gender?.toUpperCase() || "N/A"}
                       </td>
-               
                     </tr>
 
                     <tr className="border-b">
@@ -312,9 +335,3 @@ export const DogCard = ({ dog, onEdit, onDelete }) => {
   );
 };
 
-// Example usage:
-// <DogCard
-//   dog={dogData}
-//   onEdit={() => handleEdit(dogData._id)}
-//   onDelete={() => handleDelete(dogData._id)}
-// />
