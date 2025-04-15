@@ -35,7 +35,7 @@ export const DogCard = ({ dog, onEdit }) => {
   };
 
   const user = useSelector((state) => state.auth?.user);
-  const isOwner = dog?.breederName === user?._id;
+  const isOwner = dog?.breederName?._id === user?._id;
   const onDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this dog?")) {
       return false;
@@ -108,7 +108,7 @@ export const DogCard = ({ dog, onEdit }) => {
                   <div className="flex items-center gap-3">
                     <Building2 className="w-5 h-5 text-gray-500" />
                     <span className="text-sm text-gray-700">
-                      {dog.breederName}
+                      {dog.breederName?._id}
                     </span>
                   </div>
                   <p className="text-gray-600 mt-2 line-clamp-3 italic">
@@ -201,7 +201,7 @@ export const DogCard = ({ dog, onEdit }) => {
                         Breeder:
                       </td>
                       <td className="py-3 px-4 font-semibold text-gray-900">
-                        {dog.breederName || "N/A"}
+                        {dog.breederName?.name || "N/A"}
                       </td>
                     </tr>
 

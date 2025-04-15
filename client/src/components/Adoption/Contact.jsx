@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ import {
   MessageCircle,
   CheckCircle,
   Loader2,
+  X,
 } from "lucide-react";
 import { PawPrint } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -42,7 +44,6 @@ export default function Contact({ dogData }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user?.role);
   const [submitted, setSubmitted] = useState(false);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [pidx, setPidx] = useState(null);
   const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
   const [paymentResult, setPaymentResult] = useState(null);
@@ -61,30 +62,33 @@ export default function Contact({ dogData }) {
     },
   });
 
-  // Check for pidx in URL on page load
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const pidxFromUrl = urlParams.get("pidx");
     if (pidxFromUrl) {
       setPidx(pidxFromUrl);
-      setIsDialogOpen(true); // Open dialog when returning from payment
+      setIsDialogOpen(true);
     }
   }, []);
 
-  const {
-    data: paymentData,
-    isLoading: verifyLoading,
-    error: verifyError,
-  } = useCompletePaymentQuery(pidx, {
-    skip: !pidx,
-  });
+const {
+  data: paymentData,
+  isLoading: verifyLoading,
+  error: verifyError,
+} = useCompletePaymentQuery(
+  { pidx, dog: dog.id },
+  {
+    skip: !pidx || !dog?.id,
+  }
+);
+
+
 
   useEffect(() => {
     if (paymentData) {
       setPaymentResult(paymentData);
       if (paymentData.success) {
         setSubmitted(true);
-        setShowSuccessPopup(true);
         toast.success("Payment Verified Successfully");
       } else {
         toast.error(paymentData.message || "Payment Verification Failed");
@@ -101,16 +105,15 @@ export default function Contact({ dogData }) {
 
   const handlePayment = async (data) => {
     try {
-      // Add dog information to the payment data
       const paymentData = {
         ...data,
         dogId: dog.id,
         amount: dog.price,
+        dogname: dog.name,
       };
 
       const res = await initiatePayment(paymentData).unwrap();
       if (res.success) {
-        // Redirect to Khalti payment page
         window.location.href = res?.payment_url;
       } else {
         toast.error(res?.message || "Could not initiate payment");
@@ -125,28 +128,21 @@ export default function Contact({ dogData }) {
     setPaymentResult(null);
     setPidx(null);
     setSubmitted(false);
-    setShowSuccessPopup(false);
     reset();
-    // Remove pidx from URL
     window.history.pushState({}, document.title, window.location.pathname);
     setIsDialogOpen(false);
   };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      {user === "user" ? (
+      {user === "user" && (
         <DialogTrigger asChild>
-          <Button
-            onClick={(e) => {
-              // No need to prevent default when using DialogTrigger
-              // The DialogTrigger component handles opening the dialog
-            }}
-            className="w-full"
-          >
+          <Button onClick={() => setIsDialogOpen(true)} className="w-full">
             Contact & Adopt
           </Button>
         </DialogTrigger>
-      ) : (
+      )}
+      {user !== "user" && user !== "breeder" && (
         <Button
           onClick={(e) => {
             e.preventDefault();
@@ -157,7 +153,24 @@ export default function Contact({ dogData }) {
           Contact & Adopt
         </Button>
       )}
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onInteractOutside={(e) => {
+          if (submitted) e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          if (submitted) e.preventDefault();
+        }}
+      >
+        {submitted && (
+          <DialogClose
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            onClick={resetForm}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
+        )}
         <ScrollArea className="max-h-[calc(100vh-8rem)]">
           {!submitted ? (
             <>
@@ -187,7 +200,7 @@ export default function Contact({ dogData }) {
                     </p>
                     <p>
                       <span className="font-medium">Breeder:</span>{" "}
-                      {dog.breederName}
+                      {dog.breederName?.name}
                     </p>
                   </div>
                   <div className="mt-2 flex items-center gap-2 text-[#11A8C6] font-semibold text-base">
@@ -290,7 +303,6 @@ export default function Contact({ dogData }) {
                       <DialogFooter className="pt-4">
                         <Button
                           type="button"
-                          // type="submit"
                           onClick={handleSubmit(handlePayment)}
                           disabled={isLoading}
                           className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -317,8 +329,10 @@ export default function Contact({ dogData }) {
               </div>
               <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
               <p className="text-gray-600 mb-6">
-                Your payment for {dog.name} has been processed. The breeder will
-                be notified and will contact you shortly with next steps.
+                Your payment for{" "}
+                <span className="text-green-500">{dog.name}</span> has been
+                processed. The breeder will be notified and will contact you
+                shortly with next steps.
               </p>
               <div className="bg-blue-50 p-4 rounded-md text-left mb-6">
                 <h3 className="font-medium text-blue-800 mb-1">
@@ -327,7 +341,6 @@ export default function Contact({ dogData }) {
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>The breeder will receive your contact information</li>
                   <li>They will reach out to arrange a meeting or delivery</li>
-                  <li>You'll receive a confirmation email with all details</li>
                 </ul>
               </div>
               <Button onClick={resetForm} variant="outline">
