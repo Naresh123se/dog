@@ -19,17 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "react-toastify"; // Import Toastify
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
   const location = useLocation(); // Hook to get current path
-
-  // Function to show toast message for integration notice
-  const showToast = () => {
-    toast.success("Food Integration soon!");
-  };
 
   // Function to scroll to section
   const scrollToSection = (sectionId) => {
@@ -53,12 +47,6 @@ const Nav = () => {
       : []),
     { path: "/breed", label: "Breeds", activeClass: "text-indigo-600" },
     { path: "/blog", label: "Blog", activeClass: "text-teal-500" },
-    {
-      // path: "/food",
-      label: "Foods",
-      activeClass: "text-green-600",
-      onClick: showToast,
-    }, // Added onClick for "Foods"
     { path: "/adoption", label: "Adoption", activeClass: "text-green-600" },
   ];
 

@@ -4,11 +4,9 @@ import { ServicesSection } from "./Services";
 import { BenefitCards } from "./BenefitCards";
 import { Work } from "./Work";
 import { Seamless } from "./Seamless";
-import { Testimonial } from "./Testimonial";
 import Footer from "../Footer/Footer";
-import Hero from "./Hero";
 import Top from "../Header/Nav/Top";
-
+import Testimonial from "./Testimonial";
 export {
   Interactive,
   StatsSection,
@@ -18,6 +16,5 @@ export {
   Seamless,
   Testimonial,
   Footer,
-  Hero,
   Top,
 };

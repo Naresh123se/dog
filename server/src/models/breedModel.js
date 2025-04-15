@@ -21,11 +21,11 @@ const breedSchema = new mongoose.Schema({
   },
   exercise: {
     type: String,
-    required: [true, "Exercise info is required"],
+    required: [false, "Exercise info is required"],
   },
   grooming: {
     type: String,
-    required: [true, "Grooming info is required"],
+    required: [false, "Grooming info is required"],
   },
   healthIssues: {
     type: String,
@@ -46,7 +46,7 @@ const breedSchema = new mongoose.Schema({
   },
   temperament: {
     type: String,
-    required: [true, "Temperament info is required"],
+    required: [false, "Temperament info is required"],
   },
 
   images: [

@@ -47,53 +47,53 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
     },
   });
 
- const handleImageChange = (e) => {
-   const files = Array.from(e.target.files || []);
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files || []);
 
-   if (files.length === 0) {
-     setErrorMessage("Please select at least one image.");
-     return;
-   }
-   // Check total images won't exceed limit
-   if (imagePreviews.length + files.length > MAX_IMAGES) {
-     setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
-     return;
-   }
+    if (files.length === 0) {
+      setErrorMessage("Please select at least one image.");
+      return;
+    }
+    // Check total images won't exceed limit
+    if (imagePreviews.length + files.length > MAX_IMAGES) {
+      setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
 
-   // Validate file sizes
-   const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
-   if (oversizedFiles.length > 0) {
-     toast.error(`Some images exceed 5MB limit`);
-     return;
-   }
+    // Validate file sizes
+    const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      toast.error(`Some images exceed 5MB limit`);
+      return;
+    }
 
-   setUploading(true);
-   setErrorMessage("");
+    setUploading(true);
+    setErrorMessage("");
 
-   // Process each file to base64
-   const promises = files.map((file) => {
-     return new Promise((resolve) => {
-       const reader = new FileReader();
-       reader.onload = () => resolve(reader.result);
-       reader.readAsDataURL(file);
-     });
-   });
+    // Process each file to base64
+    const promises = files.map((file) => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    });
 
-   Promise.all(promises)
-     .then((newBase64Images) => {
-       setImagePreviews((prev) => [...prev, ...newBase64Images]);
-       setValue("images", [...watch("images"), ...newBase64Images], {
-         shouldDirty: true,
-       });
-     })
-     .catch((error) => {
-       toast.error("Failed to process images");
-       console.error("Image processing error:", error);
-     })
-     .finally(() => {
-       setUploading(false);
-     });
- };
+    Promise.all(promises)
+      .then((newBase64Images) => {
+        setImagePreviews((prev) => [...prev, ...newBase64Images]);
+        setValue("images", [...watch("images"), ...newBase64Images], {
+          shouldDirty: true,
+        });
+      })
+      .catch((error) => {
+        toast.error("Failed to process images");
+        console.error("Image processing error:", error);
+      })
+      .finally(() => {
+        setUploading(false);
+      });
+  };
 
   const removeImage = (index) => {
     const newPreviews = [...imagePreviews];
@@ -142,21 +142,21 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
     }
   }, [breed, reset]);
 
-const onFormSubmit = (data) => {
-  if (imagePreviews.length === 0) {
-    setErrorMessage("At least one image is required");
-    return;
-  }
+  const onFormSubmit = (data) => {
+    if (imagePreviews.length === 0) {
+      setErrorMessage("At least one image is required");
+      return;
+    }
 
-  const formattedData = {
-    ...data,
-    _id: breed?._id,
-    hypoallergenic:
-      data.hypoallergenic === true || data.hypoallergenic === "true",
-    images: imagePreviews,
+    const formattedData = {
+      ...data,
+      _id: breed?._id,
+      hypoallergenic:
+        data.hypoallergenic === true || data.hypoallergenic === "true",
+      images: imagePreviews,
+    };
+    onSubmit(formattedData);
   };
-  onSubmit(formattedData);
-};
 
   return (
     <DialogContent className="sm:max-w-[625px]">
@@ -167,9 +167,109 @@ const onFormSubmit = (data) => {
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="grid gap-4 py-4 px-1">
             <div className="space-y-4">
+              {/* Form Fields */}
+              <div>
+                <Label htmlFor="name">Name *</Label>
+                <Input
+                  id="name"
+                  {...register("name", { required: "Name is required" })}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="origin">Origin *</Label>
+                <Input id="origin" {...register("origin")} />
+              </div>
+
+              <div>
+                <Label htmlFor="size">Size *</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setValue("size", value, { shouldDirty: true })
+                  }
+                  value={watch("size") || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Small">Small</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="Large">Large</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="lifespan">Lifespan *</Label>
+                <Input id="lifespan" {...register("lifespan")} />
+              </div>
+
+              <div>
+                <Label htmlFor="temperament">Temperament</Label>
+                <Input id="temperament" {...register("temperament")} />
+              </div>
+
+              <div>
+                <Label htmlFor="grooming">Grooming</Label>
+                <Input id="grooming" {...register("grooming")} />
+              </div>
+
+              <div>
+                <Label htmlFor="exercise">Exercise</Label>
+                <Input id="exercise" {...register("exercise")} />
+              </div>
+
+              <div>
+                <Label htmlFor="diet">Diet *</Label>
+                <Input id="diet" {...register("diet")} />
+              </div>
+
+              <div>
+                <Label htmlFor="healthIssues">Health Issues *</Label>
+                <Input id="healthIssues" {...register("healthIssues")} />
+              </div>
+
+              <div>
+                <Label htmlFor="energyLevel">Energy Level *</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setValue("energyLevel", value, { shouldDirty: true })
+                  }
+                  value={watch("energyLevel") || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select energy level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="hypoallergenic">Hypoallergenic *</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setValue("hypoallergenic", value, { shouldDirty: true })
+                  }
+                  value={String(watch("hypoallergenic"))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="true">Yes</SelectItem>
+                    <SelectItem value="false">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Image Upload Section */}
               <div className="space-y-2">
-                <Label>Breed Images (Max {MAX_IMAGES})</Label>
+                <Label>Breed Images *</Label>
                 <Input
                   id="photo"
                   type="file"
@@ -190,9 +290,10 @@ const onFormSubmit = (data) => {
                   {uploading ? "Uploading..." : "Upload Images"}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                  Max {MAX_IMAGES} images, 5MB each (JPEG, PNG)
+                 5MB image (JPEG, PNG)
                 </p>
               </div>
+
               {/* Image Previews */}
               <div className="space-y-2">
                 {imagePreviews.length > 0 ? (
@@ -229,106 +330,6 @@ const onFormSubmit = (data) => {
                     {errorMessage}
                   </p>
                 )}
-              </div>
-
-              {/* Form Fields */}
-              <div>
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  {...register("name", { required: "Name is required" })}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="origin">Origin</Label>
-                <Input id="origin" {...register("origin")} />
-              </div>
-
-              <div>
-                <Label htmlFor="size">Size</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setValue("size", value, { shouldDirty: true })
-                  }
-                  value={watch("size") || ""}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Small">Small</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Large">Large</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="lifespan">Lifespan</Label>
-                <Input id="lifespan" {...register("lifespan")} />
-              </div>
-
-              <div>
-                <Label htmlFor="temperament">Temperament</Label>
-                <Input id="temperament" {...register("temperament")} />
-              </div>
-
-              <div>
-                <Label htmlFor="grooming">Grooming</Label>
-                <Input id="grooming" {...register("grooming")} />
-              </div>
-
-              <div>
-                <Label htmlFor="exercise">Exercise</Label>
-                <Input id="exercise" {...register("exercise")} />
-              </div>
-
-              <div>
-                <Label htmlFor="diet">Diet</Label>
-                <Input id="diet" {...register("diet")} />
-              </div>
-
-              <div>
-                <Label htmlFor="healthIssues">Health Issues</Label>
-                <Input id="healthIssues" {...register("healthIssues")} />
-              </div>
-
-              <div>
-                <Label htmlFor="energyLevel">Energy Level</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setValue("energyLevel", value, { shouldDirty: true })
-                  }
-                  value={watch("energyLevel") || ""}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select energy level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Low">Low</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="hypoallergenic">Hypoallergenic</Label>
-                <Select
-                  onValueChange={(value) =>
-                    setValue("hypoallergenic", value, { shouldDirty: true })
-                  }
-                  value={String(watch("hypoallergenic"))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 
