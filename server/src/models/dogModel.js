@@ -22,6 +22,12 @@ const dogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isPay: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+  
   bio: {
     type: String,
     required: true,
@@ -30,6 +36,7 @@ const dogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+
   photo: [
     {
       public_id: {

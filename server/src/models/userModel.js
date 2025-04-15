@@ -61,11 +61,6 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
     },
-    paymentMethod: {
-      type: String,
-      enum: ["khalti", "cash"],
-      default: "cash",
-    },
   },
   { timestamps: true }
 );
