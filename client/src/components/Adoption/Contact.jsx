@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -8,26 +9,28 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   User,
   Mail,
   Phone,
   MessageCircle,
-  CreditCard,
   CheckCircle,
-  Calendar,
-  Shield,
+  Loader2,
 } from "lucide-react";
 import { PawPrint } from "lucide-react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import {
+  useCompletePaymentQuery,
+  useInitiatePaymentMutation,
+} from "@/app/slices/dogApiSlice";
 
 export default function Contact({ dogData }) {
-  // This would be passed from parent component
   const dog = dogData || {
     id: "12345",
     name: "Max",
@@ -36,84 +39,136 @@ export default function Contact({ dogData }) {
     price: 1200,
     breederName: "Sarah Johnson",
   };
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user?.role);
-
-  const [formStep, setFormStep] = useState("contact");
   const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-    cardName: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    agreeToTerms: false,
-  });
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [pidx, setPidx] = useState(null);
+  const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
+  const [paymentResult, setPaymentResult] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleCheckboxChange = (checked) => {
-    setFormData({
-      ...formData,
-      agreeToTerms: checked,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Process the form submission and payment here
-    setSubmitted(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    defaultValues: {
       name: "",
       email: "",
       phone: "",
       message: "",
-      cardName: "",
-      cardNumber: "",
-      expiryDate: "",
-      cvv: "",
-      agreeToTerms: false,
-    });
-    setFormStep("contact");
+    },
+  });
+
+  // Check for pidx in URL on page load
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const pidxFromUrl = urlParams.get("pidx");
+    if (pidxFromUrl) {
+      setPidx(pidxFromUrl);
+      setIsDialogOpen(true); // Open dialog when returning from payment
+    }
+  }, []);
+
+  const {
+    data: paymentData,
+    isLoading: verifyLoading,
+    error: verifyError,
+  } = useCompletePaymentQuery(pidx, {
+    skip: !pidx,
+  });
+
+  useEffect(() => {
+    if (paymentData) {
+      setPaymentResult(paymentData);
+      if (paymentData.success) {
+        setSubmitted(true);
+        setShowSuccessPopup(true);
+        toast.success("Payment Verified Successfully");
+      } else {
+        toast.error(paymentData.message || "Payment Verification Failed");
+      }
+    }
+    if (verifyError) {
+      setPaymentResult({
+        success: false,
+        message: verifyError?.data?.message || "Verification failed",
+      });
+      toast.error(verifyError?.data?.message || "Verification failed");
+    }
+  }, [paymentData, verifyError]);
+
+  const handlePayment = async (data) => {
+    try {
+      // Add dog information to the payment data
+      const paymentData = {
+        ...data,
+        dogId: dog.id,
+        amount: dog.price,
+      };
+
+      const res = await initiatePayment(paymentData).unwrap();
+      if (res.success) {
+        // Redirect to Khalti payment page
+        window.location.href = res?.payment_url;
+      } else {
+        toast.error(res?.message || "Could not initiate payment");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || "Payment Initiation Failed");
+      console.error("Payment error:", error);
+    }
+  };
+
+  const resetForm = () => {
+    setPaymentResult(null);
+    setPidx(null);
     setSubmitted(false);
+    setShowSuccessPopup(false);
+    reset();
+    // Remove pidx from URL
+    window.history.pushState({}, document.title, window.location.pathname);
+    setIsDialogOpen(false);
   };
 
   return (
-    <Dialog>
-      {user === "user" && (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {user === "user" ? (
         <DialogTrigger asChild>
-          <Button className=" w-full">Contact & Adopt</Button>
+          <Button
+            onClick={(e) => {
+              // No need to prevent default when using DialogTrigger
+              // The DialogTrigger component handles opening the dialog
+            }}
+            className="w-full"
+          >
+            Contact & Adopt
+          </Button>
         </DialogTrigger>
+      ) : (
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            toast.info("Please login first to adopt a pet");
+          }}
+          className="w-full"
+        >
+          Contact & Adopt
+        </Button>
       )}
       <DialogContent className="sm:max-w-md">
-        {!submitted ? (
-          <>
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold">
-                {formStep === "contact"
-                  ? "Contact Breeder"
-                  : "Complete Adoption Payment"}
-              </DialogTitle>
-              <DialogDescription>
-                {formStep === "contact"
-                  ? `Interested in adopting ${dog.name}? Fill out this form to contact the breeder.`
-                  : `Complete your payment to adopt ${dog.name}.`}
-              </DialogDescription>
-            </DialogHeader>
+        <ScrollArea className="max-h-[calc(100vh-8rem)]">
+          {!submitted ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">Contact</DialogTitle>
+                <DialogDescription>
+                  Interested in adopting {dog.name}? Fill out this form to
+                  contact the breeder.
+                </DialogDescription>
+              </DialogHeader>
 
-            {formStep === "contact" ? (
               <div className="space-y-4 py-2">
                 <div className="bg-white shadow-md rounded-2xl p-5 mb-6 border border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -140,216 +195,147 @@ export default function Contact({ dogData }) {
                     Rs. {dog.price}
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="flex items-center gap-2">
-                    <User size={16} /> Your Name
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your full name"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail size={16} /> Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
-                    <Phone size={16} /> Phone Number
-                  </Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your phone number"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="message" className="flex items-center gap-2">
-                    <MessageCircle size={16} /> Message
-                  </Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    placeholder="Tell the breeder why you're interested in this dog and ask any questions you may have."
-                    className="min-h-24"
-                  />
-                </div>
-                <DialogFooter className="pt-4">
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 w-full"
-                    onClick={() => setFormStep("payment")}
-                  >
-                    Proceed to Payment
-                  </Button>
-                </DialogFooter>
-              </div>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Payment Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="cardName"
-                      className="flex items-center gap-2"
-                    >
-                      <User size={16} /> Name on Card
-                    </Label>
-                    <Input
-                      id="cardName"
-                      name="cardName"
-                      value={formData.cardName}
-                      onChange={handleChange}
-                      placeholder="Enter name on card"
-                      required
-                    />
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="cardNumber"
-                      className="flex items-center gap-2"
-                    >
-                      <CreditCard size={16} /> Card Number
-                    </Label>
-                    <Input
-                      id="cardNumber"
-                      name="cardNumber"
-                      value={formData.cardNumber}
-                      onChange={handleChange}
-                      placeholder="1234 5678 9012 3456"
-                      required
-                    />
+                {verifyLoading ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-4" />
+                    <p className="text-gray-600">Verifying your payment...</p>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="expiryDate">Expiry Date</Label>
-                      <div className="relative">
+                ) : (
+                  <form onSubmit={(e) => e.preventDefault()}>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="name"
+                          className="flex items-center gap-2"
+                        >
+                          <User size={16} /> Your Name
+                        </Label>
                         <Input
-                          id="expiryDate"
-                          name="expiryDate"
-                          value={formData.expiryDate}
-                          onChange={handleChange}
-                          placeholder="MM/YY"
-                          required
+                          id="name"
+                          {...register("name", {
+                            required: "Name is required",
+                          })}
+                          placeholder="Enter your full name"
                         />
-                        <Calendar className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
+                        {errors.name && (
+                          <p className="text-sm text-red-500">
+                            {errors.name.message}
+                          </p>
+                        )}
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cvv">CVV</Label>
-                      <Input
-                        id="cvv"
-                        name="cvv"
-                        value={formData.cvv}
-                        onChange={handleChange}
-                        placeholder="123"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox
-                      id="agreeToTerms"
-                      checked={formData.agreeToTerms}
-                      onCheckedChange={handleCheckboxChange}
-                    />
-                    <label
-                      htmlFor="agreeToTerms"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      I agree to the adoption terms and conditions
-                    </label>
-                  </div>
-
-                  <div className="bg-gray-50 p-3 rounded-md mt-4">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Adoption Fee for {dog.name}</span>
-                      <span>${dog.price}.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Processing Fee</span>
-                      <span>$25.00</span>
-                    </div>
-                    <div className="border-t pt-1 mt-1">
-                      <div className="flex justify-between font-medium">
-                        <span>Total</span>
-                        <span>${dog.price + 25}.00</span>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="email"
+                          className="flex items-center gap-2"
+                        >
+                          <Mail size={16} /> Email Address
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message: "Invalid email address",
+                            },
+                          })}
+                          placeholder="Enter your email"
+                        />
+                        {errors.email && (
+                          <p className="text-sm text-red-500">
+                            {errors.email.message}
+                          </p>
+                        )}
                       </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="phone"
+                          className="flex items-center gap-2"
+                        >
+                          <Phone size={16} /> Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          {...register("phone", {
+                            required: "Phone number is required",
+                            pattern: {
+                              value: /^[0-9]{10,15}$/,
+                              message: "Invalid phone number",
+                            },
+                          })}
+                          placeholder="Enter your phone number"
+                        />
+                        {errors.phone && (
+                          <p className="text-sm text-red-500">
+                            {errors.phone.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="message"
+                          className="flex items-center gap-2"
+                        >
+                          <MessageCircle size={16} /> Message
+                        </Label>
+                        <Textarea
+                          id="message"
+                          {...register("message")}
+                          placeholder="Tell the breeder why you're interested in this dog and ask any questions you may have."
+                          className="min-h-24"
+                        />
+                      </div>
+                      <DialogFooter className="pt-4">
+                        <Button
+                          type="button"
+                          // type="submit"
+                          onClick={handleSubmit(handlePayment)}
+                          disabled={isLoading}
+                          className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : (
+                            "Pay with Khalti"
+                          )}
+                        </Button>
+                      </DialogFooter>
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mt-2">
-                    <Shield size={16} /> Secure payment processing
-                  </div>
-                </CardContent>
-
-                <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:justify-between px-6 pb-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => setFormStep("contact")}
-                    className="sm:w-auto w-full"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 sm:w-auto w-full"
-                    onClick={handleSubmit}
-                    disabled={!formData.agreeToTerms}
-                  >
-                    Complete Purchase
-                  </Button>
-                </DialogFooter>
-              </Card>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-8">
-            <div className="inline-flex rounded-full bg-green-100 p-4 mb-4">
-              <CheckCircle className="h-10 w-10 text-green-600" />
+                  </form>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <div className="inline-flex rounded-full bg-green-100 p-4 mb-4">
+                <CheckCircle className="h-10 w-10 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
+              <p className="text-gray-600 mb-6">
+                Your payment for {dog.name} has been processed. The breeder will
+                be notified and will contact you shortly with next steps.
+              </p>
+              <div className="bg-blue-50 p-4 rounded-md text-left mb-6">
+                <h3 className="font-medium text-blue-800 mb-1">
+                  What happens next?
+                </h3>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>The breeder will receive your contact information</li>
+                  <li>They will reach out to arrange a meeting or delivery</li>
+                  <li>You'll receive a confirmation email with all details</li>
+                </ul>
+              </div>
+              <Button onClick={resetForm} variant="outline">
+                Close
+              </Button>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
-            <p className="text-gray-600 mb-6">
-              Your payment for {dog.name} has been processed. The breeder will
-              be notified and will contact you shortly with next steps.
-            </p>
-            <div className="bg-blue-50 p-4 rounded-md text-left mb-6">
-              <h3 className="font-medium text-blue-800 mb-1">
-                What happens next?
-              </h3>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>The breeder will receive your contact information</li>
-                <li>They will reach out to arrange a meeting or delivery</li>
-                <li>You'll receive a confirmation email with all details</li>
-              </ul>
-            </div>
-            <Button onClick={resetForm} variant="outline">
-              Close
-            </Button>
-          </div>
-        )}
+          )}
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

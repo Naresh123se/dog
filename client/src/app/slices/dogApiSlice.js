@@ -53,6 +53,23 @@ export const dogApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    //kahlti completePayment
+    completePayment: builder.query({
+      query: (pidx) => ({
+        url: `${dog_url}/complete-payment?pidx=${pidx}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    //kahlti initiatePayment
+    initiatePayment: builder.mutation({
+      query: (data) => ({
+        url: `${dog_url}/initiate-payment`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -63,4 +80,6 @@ export const {
   useGetDogByIdQuery,
   useGetDogsByBreedQuery,
   useDeleteDogMutation,
+  useCompletePaymentQuery,
+  useInitiatePaymentMutation,
 } = dogApiSlice;

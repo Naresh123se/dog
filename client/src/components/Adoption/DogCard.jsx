@@ -37,7 +37,6 @@ export const DogCard = ({ dog, onEdit }) => {
   const user = useSelector((state) => state.auth?.user);
   const isOwner = dog?.breederName === user?._id;
   const onDelete = async () => {
-    
     if (!window.confirm("Are you sure you want to delete this dog?")) {
       return false;
     }
@@ -119,7 +118,13 @@ export const DogCard = ({ dog, onEdit }) => {
               </CardContent>
 
               <CardFooter className="p-4 pt-0 flex space-x-3">
-                {user?.role === "breeder" && <Contact dogData={dog} />}
+                <button className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <Contact dogData={dog} />
+                </button>
 
                 {isOwner && (
                   <>
@@ -291,7 +296,7 @@ export const DogCard = ({ dog, onEdit }) => {
                         Size:
                       </td>
                       <td className="py-3 px-4 font-semibold text-gray-900">
-                        {dog.size}
+                        {dog?.size}
                       </td>
                     </tr>
                   </tbody>
@@ -299,7 +304,13 @@ export const DogCard = ({ dog, onEdit }) => {
               </div>
 
               <div className="mt-6 flex justify-end space-x-4">
-                {user?.role === "breeder" && <Contact dogData={dog} />}
+              <button className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <Contact dogData={dog} />
+                </button>
 
                 {isOwner && (
                   <>
@@ -334,4 +345,3 @@ export const DogCard = ({ dog, onEdit }) => {
     </>
   );
 };
-
