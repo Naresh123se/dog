@@ -7,11 +7,11 @@ const dogSchema = new mongoose.Schema({
     trim: true,
   },
   age: {
-    type: String,
+    type: Number,
     required: true,
   },
   breed: {
-    type: String, // Can be ObjectId if you have Breed model
+    type: String,
     required: true,
   },
   location: {
@@ -19,7 +19,7 @@ const dogSchema = new mongoose.Schema({
     required: true,
   },
   price: {
-    type: String,
+    type: Number,
     required: true,
   },
   isPay: {
@@ -27,7 +27,6 @@ const dogSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-  
   bio: {
     type: String,
     required: true,
@@ -36,8 +35,8 @@ const dogSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-
-  photo: [
+  // Renamed from photo to photos to match the useEffect
+  photos: [
     {
       public_id: {
         type: String,
@@ -59,7 +58,79 @@ const dogSchema = new mongoose.Schema({
     enum: ["Small", "Medium", "Large", "X-Large"],
     default: "Medium",
   },
-  // Other fields as needed...
+  // New fields based on useEffect
+  microchip: {
+    type: String,
+  },
+  color: {
+    type: String,
+  },
+  dob: {
+    type: Date,
+  },
+  ownerName: {
+    type: String,
+  },
+  ownerAddress: {
+    type: String,
+  },
+  regDate: {
+    type: Date,
+  },
+  regNumber: {
+    type: String,
+  },
+  breeder: {
+    type: String,
+  },
+  sireName: {
+    type: String,
+  },
+  sireRegNumber: {
+    type: String,
+  },
+  sireColor: {
+    type: String,
+  },
+  damName: {
+    type: String,
+  },
+  damRegNumber: {
+    type: String,
+  },
+  damColor: {
+    type: String,
+  },
+  sireGrandfather: {
+    type: String,
+  },
+  sireGrandfatherReg: {
+    type: String,
+  },
+  sireGrandmother: {
+    type: String,
+  },
+  sireGrandmotherReg: {
+    type: String,
+  },
+  damGrandfather: {
+    type: String,
+  },
+  damGrandfatherReg: {
+    type: String,
+  },
+  damGrandfatherColor: {
+    type: String,
+  },
+  damGrandmother: {
+    type: String,
+  },
+  damGrandmotherReg: {
+    type: String,
+  },
+  damGrandmotherColor: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -1,16 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  BookOpen,
-  Users,
-  Edit2,
-  X,
-  Check,
-  Camera,
-} from "lucide-react";
+import { Mail, Phone, MapPin, Edit2, X, Check, Camera } from "lucide-react";
 import {
   useGetUserProfileQuery,
   useUpdateUserProfileMutation,

@@ -100,7 +100,9 @@ const Nav = () => {
                   <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none">
                     <Avatar className="ring ring-[#90b8c0]">
                       <AvatarImage src={user?.avatar?.url} />
-                      <AvatarFallback>{user.name}</AvatarFallback>
+                      <AvatarFallback className="capitalize">
+                        {user.name.slice(0, 2)}
+                      </AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">

@@ -10,12 +10,46 @@ import Payment from "../models/Payment.js";
 class DogController {
   // Add new dog
   static addDog = asyncHandler(async (req, res, next) => {
-    const { name, age, breed, location, price, bio, gender, size, photos } =
-      req.body;
+    const {
+      name,
+      age,
+      breed,
+      location,
+      price,
+      bio,
+      gender,
+      size,
+      photos,
+      microchip,
+      color,
+      dob,
+      ownerName,
+      ownerAddress,
+      regDate,
+      regNumber,
+      breeder,
+      sireName,
+      sireRegNumber,
+      sireColor,
+      damName,
+      damRegNumber,
+      damColor,
+      sireGrandfather,
+      sireGrandfatherReg,
+      sireGrandmother,
+      sireGrandmotherReg,
+      damGrandfather,
+      damGrandfatherReg,
+      damGrandfatherColor,
+      damGrandmother,
+      damGrandmotherReg,
+      damGrandmotherColor,
+    } = req.body;
 
-    if (!photos) {
-      return next(new ErrorHandler("Atleast one image is required", 400));
+    if (!photos || photos.length === 0) {
+      return next(new ErrorHandler("At least one image is required", 400));
     }
+
     const breederName = await User.findOne({ _id: req.user._id });
 
     const imagesLinks = [];
@@ -42,7 +76,32 @@ class DogController {
       gender,
       breederName,
       size,
-      photo: imagesLinks, // Assuming you're using file upload middleware
+      photos: imagesLinks, // Changed from photo to photos to match schema
+      // Add all the new fields
+      microchip,
+      color,
+      dob,
+      ownerName,
+      ownerAddress,
+      regDate,
+      regNumber,
+      breeder,
+      sireName,
+      sireRegNumber,
+      sireColor,
+      damName,
+      damRegNumber,
+      damColor,
+      sireGrandfather,
+      sireGrandfatherReg,
+      sireGrandmother,
+      sireGrandmotherReg,
+      damGrandfather,
+      damGrandfatherReg,
+      damGrandfatherColor,
+      damGrandmother,
+      damGrandmotherReg,
+      damGrandmotherColor,
     });
 
     res.status(201).json({
@@ -78,7 +137,6 @@ class DogController {
       dog,
     });
   });
-
   // Update dog
   static updateDog = asyncHandler(async (req, res, next) => {
     let dog = await Dog.findById(req.params.id);
@@ -87,7 +145,61 @@ class DogController {
       return next(new ErrorHandler("Dog not found", 404));
     }
 
-    dog = await Dog.findByIdAndUpdate(req.params.id, req.body, {
+    // Check if the current user is the breeder of this dog
+    if (
+      dog.breederName &&
+      dog.breederName.toString() !== req.user._id.toString()
+    ) {
+      return next(
+        new ErrorHandler("You are not authorized to update this dog", 403)
+      );
+    }
+
+    const updatedData = { ...req.body };
+
+    // Handle photos upload if new photos are provided
+    if (req.body.photos && req.body.photos.length > 0) {
+      // Check if photos are base64 strings (new uploads)
+      if (typeof req.body.photos[0] === "string") {
+        // Delete existing images from Cloudinary
+        if (dog.photos && dog.photos.length > 0) {
+          for (let i = 0; i < dog.photos.length; i++) {
+            await cloudinary.v2.uploader.destroy(dog.photos[i].public_id);
+          }
+        }
+
+        // Upload new images
+        const imagesLinks = [];
+        for (let i = 0; i < req.body.photos.length; i++) {
+          const result = await cloudinary.v2.uploader.upload(
+            req.body.photos[i],
+            {
+              folder: "dogs",
+              quality: "auto:best",
+              height: 600,
+            }
+          );
+
+          imagesLinks.push({
+            public_id: result.public_id,
+            url: result.secure_url,
+          });
+        }
+
+        updatedData.photos = imagesLinks;
+      }
+    }
+
+    // Parse date strings to Date objects if they exist
+    if (updatedData.dob) updatedData.dob = new Date(updatedData.dob);
+    if (updatedData.regDate)
+      updatedData.regDate = new Date(updatedData.regDate);
+
+    // Convert numeric strings to numbers
+    if (updatedData.age) updatedData.age = Number(updatedData.age);
+    if (updatedData.price) updatedData.price = Number(updatedData.price);
+
+    dog = await Dog.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,
       runValidators: true,
     });
@@ -98,7 +210,6 @@ class DogController {
       dog,
     });
   });
-
   // Delete dog
   static deleteDog = asyncHandler(async (req, res, next) => {
     const dog = await Dog.findById(req.params.id);
