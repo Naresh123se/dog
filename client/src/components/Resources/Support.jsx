@@ -1,4 +1,12 @@
-import { LifeBuoy, Mail, MessageSquare, Zap } from "lucide-react";
+import {
+  LifeBuoy,
+  Mail,
+  MessageSquare,
+  Zap,
+  Dog,
+  Bone,
+  Heart,
+} from "lucide-react";
 import { Footer, Nav } from "..";
 
 export default function Support() {
@@ -10,7 +18,7 @@ export default function Support() {
         <div className="flex items-center gap-3 mb-8">
           <LifeBuoy className="w-8 h-8 text-[#4338CA]" />
           <h1 className="text-3xl font-bold text-gray-900">
-            Distributor Support
+            Dog Lovers Support
           </h1>
         </div>
 
@@ -21,11 +29,11 @@ export default function Support() {
               <h2 className="text-xl font-semibold">Email Support</h2>
             </div>
             <p className="text-gray-700 mb-4">
-              Need help with your distribution network? Our logistics experts
-              respond within 24 hours.
+              Have questions about your dog's care or our products? Our pet
+              experts respond within 24 hours.
             </p>
             <a
-              href="mailto:support@distribpro.com"
+              href="mailto:support@pawfect.com"
               className="inline-flex items-center px-4 py-2 bg-[#4338CA] text-white rounded-md hover:bg-[#4338CA]/90 transition-colors"
             >
               Contact Us
@@ -38,11 +46,11 @@ export default function Support() {
               <h2 className="text-xl font-semibold">Live Chat</h2>
             </div>
             <p className="text-gray-700 mb-4">
-              Get instant help from our distribution specialists during business
+              Get instant help from our dog care specialists during business
               hours.
             </p>
             <button className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
-              Coming Soon
+              Comming Soon
             </button>
           </div>
 
@@ -55,31 +63,31 @@ export default function Support() {
             <div className="space-y-4">
               <div className="border-b pb-4">
                 <h3 className="font-medium text-gray-900">
-                  How do I add a new warehouse to my network?
+                  How do I choose the right food for my dog's breed?
                 </h3>
                 <p className="text-gray-700 mt-1">
-                  Go to Locations → Warehouses → Add New. You'll need to provide
-                  capacity, address, and operational details.
+                  We provide breed-specific recommendations in your account
+                  dashboard based on your dog's age, weight, and activity level.
                 </p>
               </div>
 
               <div className="border-b pb-4">
                 <h3 className="font-medium text-gray-900">
-                  Is my distribution data secure?
+                  Is my pet's information secure?
                 </h3>
                 <p className="text-gray-700 mt-1">
-                  Absolutely. We use military-grade encryption for all your
-                  supply chain data and conduct regular security audits.
+                  Absolutely. We treat your pet's data with the same care we'd
+                  want for our own dogs, using bank-level security.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-medium text-gray-900">
-                  Can I integrate with existing ERP systems?
+                  Do you offer veterinary advice?
                 </h3>
                 <p className="text-gray-700 mt-1">
-                  Yes, we support integration with most major ERP and warehouse
-                  management systems through our API.
+                  While we can provide general care tips, we always recommend
+                  consulting with a licensed veterinarian for medical advice.
                 </p>
               </div>
             </div>

@@ -1,5 +1,4 @@
-// TermsOfService.jsx
-import { ScrollText, ShieldCheck, Package, Truck } from "lucide-react";
+import { ScrollText, ShieldCheck, Bone, PawPrint } from "lucide-react";
 import { Footer, Nav } from "..";
 
 export default function TermsOfService() {
@@ -23,35 +22,34 @@ export default function TermsOfService() {
               1. Acceptance of Terms
             </h2>
             <p className="text-gray-700">
-              By using our distributor management system ("Service"), you agree
-              to these Terms of Service. If you disagree, please refrain from
-              using our Service.
+              By using our dog care platform ("Service"), you agree to these
+              Terms of Service. If you disagree, please refrain from using our
+              Service.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Package className="w-5 h-5 text-[#4338CA]" />
+              <Bone className="w-5 h-5 text-[#4338CA]" />
               2. Service Description
             </h2>
             <p className="text-gray-700">
-              Our Service provides comprehensive tools for inventory management,
-              distribution network optimization, and supply chain analytics. We
-              help streamline your logistics operations and improve delivery
-              efficiency.
+              Our Service provides dog care products, resources, and community
+              features to help you give your pup the best life possible. We
+              offer food, toys, health tips, and more.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <Truck className="w-5 h-5 text-[#4338CA]" />
+              <PawPrint className="w-5 h-5 text-[#4338CA]" />
               3. User Responsibilities
             </h2>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>You must provide accurate inventory and distribution data</li>
-              <li>You are responsible for maintaining warehouse information</li>
-              <li>You agree not to use the Service for illegal shipments</li>
-              <li>You must comply with all applicable trade regulations</li>
+              <li>You must provide accurate information about your dog(s)</li>
+              <li>You are responsible for your dog's health and wellbeing</li>
+              <li>You agree not to use the Service for illegal activities</li>
+              <li>You must comply with all local pet ownership laws</li>
             </ul>
           </section>
 
@@ -60,9 +58,9 @@ export default function TermsOfService() {
               4. Limitation of Liability
             </h2>
             <p className="text-gray-700">
-              Our Service is provided "as is". We are not liable for any
-              operational disruptions, delivery delays, or inventory
-              discrepancies resulting from your use of the system.
+              Our Service provides general information and products. We are not
+              liable for any health issues your dog may experience. Always
+              consult a veterinarian for medical advice.
             </p>
           </section>
 

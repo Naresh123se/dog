@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -97,10 +98,10 @@ const Nav = () => {
               <div className="flex items-center space-x-4">
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                      <UserCircle className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <span className="text-gray-700">{user.name}</span>
+                    <Avatar className="ring ring-[#90b8c0]">
+                      <AvatarImage src={user?.avatar?.url} />
+                      <AvatarFallback>{user.name}</AvatarFallback>
+                    </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end">
                     <DropdownMenuLabel className="ml-2 text-md shadow-sm">

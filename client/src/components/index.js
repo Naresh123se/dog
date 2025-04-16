@@ -18,6 +18,9 @@ import AdminBlogs from "./Admin/AdminBlogs";
 import AdminBreeds from "./Admin/AdminBreeds";
 import AdminDogs from "./Admin/AdminDogs";
 import AdminUsers from "./Admin/AdminUsers";
+import PrivacyPolicy1 from "./Resources/PrivacyPolicy1";
+import Support from "./Resources/Support";
+import TermsOfService from "./Resources/TermsOfService";
 
 export {
   Login,
@@ -33,6 +36,9 @@ export {
   ContentLibrary,
   Profile,
   Footer,
+  PrivacyPolicy1,
+  Support,
+  TermsOfService,
   // admin
   AdminSidebar,
   AdminNavbar,

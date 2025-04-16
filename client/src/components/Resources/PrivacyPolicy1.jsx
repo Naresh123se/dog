@@ -1,4 +1,4 @@
-import { Lock, Package, Truck, Mail } from "lucide-react";
+import { Lock, Bone, PawPrint, Dog } from "lucide-react";
 import { Footer, Nav } from "../";
 
 export default function PrivacyPolicy1() {
@@ -22,24 +22,24 @@ export default function PrivacyPolicy1() {
             </h2>
             <div className="space-y-4 text-gray-700">
               <div className="flex items-start gap-3">
-                <Package className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
+                <Bone className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
                 <p>
-                  <strong>Inventory Data:</strong> Product details, stock
-                  levels, and supply chain information you enter.
+                  <strong>Pet Information:</strong> Details about your dog(s)
+                  including breed, age, and health information.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <Truck className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
+                <PawPrint className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
                 <p>
-                  <strong>Distribution Data:</strong> Shipping details, delivery
-                  routes, and logistics information.
+                  <strong>Purchase Data:</strong> Dog food, toys, and supplies
+                  you order through our platform.
                 </p>
               </div>
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
+                <Dog className="w-5 h-5 mt-0.5 text-[#4338CA] flex-shrink-0" />
                 <p>
-                  <strong>Account Information:</strong> Business email and
-                  contact details when you register.
+                  <strong>Account Information:</strong> Your contact details and
+                  preferences when you register.
                 </p>
               </div>
             </div>
@@ -50,19 +50,24 @@ export default function PrivacyPolicy1() {
               2. How We Use Your Information
             </h2>
             <ul className="list-disc pl-6 space-y-2 text-gray-700">
-              <li>To manage and optimize your distribution network</li>
-              <li>To provide inventory tracking and forecasting</li>
-              <li>For route optimization and logistics planning</li>
-              <li>To communicate with you about your account</li>
+              <li>
+                To provide personalized product recommendations for your dog
+              </li>
+              <li>
+                To schedule and manage veterinary appointments (if applicable)
+              </li>
+              <li>To process orders for dog supplies and food</li>
+              <li>
+                To communicate with you about your account and pet care tips
+              </li>
             </ul>
           </section>
 
           <section className="mb-8">
             <h2 className="text-xl font-semibold mb-4">3. Data Security</h2>
             <p className="text-gray-700">
-              We implement enterprise-grade security measures to protect your
-              distribution data. All supply chain information is encrypted both
-              in transit and at rest.
+              We implement strong security measures to protect your pet's
+              information. All data is encrypted and stored securely.
             </p>
           </section>
 
@@ -71,8 +76,8 @@ export default function PrivacyPolicy1() {
               4. Third-Party Services
             </h2>
             <p className="text-gray-700">
-              We integrate with logistics providers and warehouse management
-              systems that may process your data. These services have their own
+              We may work with veterinary services, pet food suppliers, and
+              groomers that may process your data. These services have their own
               privacy policies.
             </p>
           </section>
@@ -80,8 +85,8 @@ export default function PrivacyPolicy1() {
           <section>
             <h2 className="text-xl font-semibold mb-4">5. Your Rights</h2>
             <p className="text-gray-700">
-              You can request access to or deletion of your business data at any
-              time by contacting our support team.
+              You can request access to or deletion of your pet's information at
+              any time by contacting our support team.
             </p>
           </section>
         </div>

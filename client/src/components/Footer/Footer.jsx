@@ -17,62 +17,48 @@ const Footer = () => {
                 need for your furry friends.
               </p>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Services</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Dog Adoption
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Pet Training
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Grooming Services
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Pet Health & Nutrition
-                  </a>
-                </li>
-              </ul>
+            <div className="lg:ml-10">
+              <h3 className="text-lg font-semibold mb-2 ">Quick Link</h3>
+
+              <div className=" flex flex-col  items-start space-y-2">
+                <Link to="/" className="text-gray-400 hover:text-gray-100">
+                  Home
+                </Link>
+                <Link to="/breed" className="text-gray-400 hover:text-gray-100">
+                  Breeds
+                </Link>
+                <Link to="/blog" className="text-gray-400 hover:text-gray-100">
+                  Blog
+                </Link>
+              </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Pet Care Guides
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Blog & Articles
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Pet Products
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    FAQ
-                  </a>
-                </li>
-              </ul>
+              <h3 className="text-lg font-semibold mb-2 ">Resources</h3>
+              <div className=" flex flex-col  items-start space-y-2">
+                <Link to="/terms" className="text-gray-400 hover:text-gray-100">
+                  Terms of Service
+                </Link>
+                <Link
+                  to="/privacy"
+                  className="text-gray-400 hover:text-gray-100"
+                >
+                  Privacy Policy
+                </Link>
+                <Link
+                  to="/support"
+                  className="text-gray-400 hover:text-gray-100"
+                >
+                  Support
+                </Link>
+              </div>
             </div>
+
             <div>
-              <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
+              <h3 className="text-lg font-semibold mb-2 ">Quick Link</h3>
               <ul className="space-y-4 text-gray-400">
                 <li className="flex items-center">
                   <MapPin className="w-5 h-5 mr-2" />
-                  123 Pet Care Blvd, San Francisco, CA 94105
+                  Nepal, Kathmandu
                 </li>
                 <li className="flex items-center">
                   <Phone className="w-5 h-5 mr-2" />

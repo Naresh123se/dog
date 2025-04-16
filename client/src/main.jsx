@@ -18,6 +18,9 @@ import {
   AdminBreeds,
   AdminDogs,
   AdminUsers,
+  TermsOfService,
+  PrivacyPolicy1,
+  Support,
 } from "./components";
 import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
@@ -74,22 +77,30 @@ const router = createBrowserRouter([
           </AuthLayout>
         ),
       },
-      // {
-      //   path: "/blog",
-      //   element: (
-      //     <AuthLayout authentication={false}>
-      //       <BlogPage />
-      //     </AuthLayout>
-      //   ),
-      // },
-      // {
-      //   path: "/breed",
-      //   element: (
-      //     <AuthLayout authentication={false}>
-      //       <Breed />
-      //     </AuthLayout>
-      //   ),
-      // },
+      {
+        path: "/terms",
+        element: (
+          <AuthLayout authentication={false}>
+            <TermsOfService />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/privacy",
+        element: (
+          <AuthLayout authentication={false}>
+            <PrivacyPolicy1 />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/support",
+        element: (
+          <AuthLayout authentication={false}>
+            <Support />
+          </AuthLayout>
+        ),
+      },
 
       {
         path: "/artical",
@@ -104,10 +115,6 @@ const router = createBrowserRouter([
         path: "/",
         element: <UsersPage />,
         children: [
-          // {
-          //   index: true,
-          //   element: <Distributor />,bc
-          // },
           {
             path: "breed",
             element: (
@@ -140,14 +147,6 @@ const router = createBrowserRouter([
               </AuthLayout>
             ),
           },
-          // {
-          //   path: "add-product",
-          //   element: <AddProduct />,
-          // },
-          // {
-          //   path: "edit-product/:id",
-          //   element: <EditProduct />,
-          // },
         ],
       },
 
@@ -197,7 +196,9 @@ const router = createBrowserRouter([
   },
 ]);
 createRoot(document.getElementById("root")).render(
+  <StrictMode>
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
+  </StrictMode>
 );
