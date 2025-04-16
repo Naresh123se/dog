@@ -14,14 +14,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Dna,
   Search,
@@ -140,9 +134,6 @@ const AdminBreeds = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="ml-2">
-              <Plus className="mr-1 h-4 w-4" /> Add Breed
-            </Button>
           </div>
         </div>
       </CardHeader>

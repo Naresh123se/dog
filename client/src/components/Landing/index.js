@@ -1,6 +1,5 @@
 import { Interactive } from "./Interactive";
 import { StatsSection } from "./Stats";
-import { ServicesSection } from "./Services";
 import { BenefitCards } from "./BenefitCards";
 import { Work } from "./Work";
 import { Seamless } from "./Seamless";
@@ -10,7 +9,6 @@ import Testimonial from "./Testimonial";
 export {
   Interactive,
   StatsSection,
-  ServicesSection,
   BenefitCards,
   Work,
   Seamless,

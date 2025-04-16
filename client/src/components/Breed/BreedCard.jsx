@@ -20,9 +20,7 @@ const BreedCard = ({ breed, onSelect, onEdit, isLoading }) => {
   };
 
   const user = useSelector((state) => state.auth?.user);
-  console.log(user)
   const isOwner = breed?.owner?._id === user?._id;
-  console.log(isOwner)
 
   return (
     <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>

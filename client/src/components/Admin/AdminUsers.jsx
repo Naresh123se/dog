@@ -151,7 +151,6 @@ const AdminUsers = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="ml-2">Add User</Button>
           </div>
         </div>
       </CardHeader>

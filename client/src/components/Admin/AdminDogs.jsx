@@ -114,9 +114,6 @@ const AdminDogs = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="ml-2">
-              <Plus className="mr-1 h-4 w-4" /> Add Dog
-            </Button>
           </div>
         </div>
       </CardHeader>
@@ -131,7 +128,6 @@ const AdminDogs = () => {
               <TabsTrigger value="grid">Grid</TabsTrigger>
               <TabsTrigger value="list">List</TabsTrigger>
             </TabsList>
-           
           </div>
 
           <TabsContent value="grid" className="mt-0">

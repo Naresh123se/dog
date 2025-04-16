@@ -30,6 +30,7 @@ import {
   useInitiatePaymentMutation,
   useGetAllDogsQuery,
 } from "@/app/slices/dogApiSlice";
+import PedigreeCertificate from "./PedigreeCertificate";
 
 export default function Contact({ dogData }) {
   const dog = dogData || {
@@ -84,7 +85,6 @@ export default function Contact({ dogData }) {
   const handlePaymentVerification = async (pidx) => {
     if (!pidx || submitted) return;
     try {
-      console.log("Payment verification for dog ID:", dog?.id);
       const paymentData = await completePayment({
         pidx,
         dogId: dog?.id,
@@ -145,21 +145,28 @@ export default function Contact({ dogData }) {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-      {user === "user" ? (
+      {user === "user" && (
         <DialogTrigger asChild className="w-full">
           <Button className="w-full">Contact & Adopt</Button>
         </DialogTrigger>
-      ) : (
+      )}
+
+<div className=" flex items-center gap-10">
+
+      {user !== "user" && user !== "breeder" && (
         <Button
-          onClick={(e) => {
-            e.preventDefault();
-            toast.info("Please login first to adopt a pet");
-          }}
-          className="w-full"
+        onClick={(e) => {
+          e.preventDefault();
+          toast.info("Please login first to adopt a pet");
+        }}
         >
           Contact & Adopt
         </Button>
       )}
+
+      <PedigreeCertificate dog={dog} />
+      </div>
+
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => {

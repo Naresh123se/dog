@@ -12,6 +12,7 @@ const breedSchema = new mongoose.Schema({
   },
   diet: {
     type: String,
+    enum: ["Standard", "High-Protein", "Grain-Free", "Raw", "Specialized"],
     required: [true, "Diet is required"],
   },
   energyLevel: {
@@ -21,7 +22,8 @@ const breedSchema = new mongoose.Schema({
   },
   exercise: {
     type: String,
-    required: [false, "Exercise info is required"],
+    enum: ["Low", "Moderate", "High", "Very High"],
+    required: [true, "Exercise info is required"],
   },
   grooming: {
     type: String,
@@ -29,7 +31,7 @@ const breedSchema = new mongoose.Schema({
   },
   healthIssues: {
     type: String,
-    required: [true, "Health issues info is required"],
+    required: [false, "Health issues info is required"],
   },
   hypoallergenic: {
     type: Boolean,

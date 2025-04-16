@@ -36,7 +36,6 @@ const Activate = () => {
 
     try {
       const response = await activateAccount(payload).unwrap();
-      console.log("first");
       if (response.success) {
         navigate("/login");
         toast.success("Registration was successful");
@@ -46,7 +45,6 @@ const Activate = () => {
         err?.data?.message.charAt(0).toUpperCase() +
         err?.data?.message.slice(1);
       toast.error(errorMessage || "Activation failed. Please try again.");
-      console.log("first");
     }
   };
 

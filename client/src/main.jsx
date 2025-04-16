@@ -26,7 +26,7 @@ import { StrictMode } from "react";
 import AuthLayout from "./routes/AuthLayout";
 import AdminLayout from "./routes/AdminLayout";
 
-import { AdminDashboardPage, HomePage, UsersPage } from "./pages";
+import { AdminDashboardPage, HomePage, ServicesPage, UsersPage } from "./pages";
 import AddBlog from "./components/Blog/AddBlog";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 
@@ -94,6 +94,14 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/services",
+        element: (
+          <AuthLayout authentication={false}>
+            <ServicesPage />
+          </AuthLayout>
+        ),
+      },
+      {
         path: "/support",
         element: (
           <AuthLayout authentication={false}>
@@ -156,7 +164,11 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AdminDashboard />,
+            element: (
+              <AdminLayout authentication={true}>
+                <AdminDashboard />
+              </AdminLayout>
+            ),
           },
           {
             path: "blogs",

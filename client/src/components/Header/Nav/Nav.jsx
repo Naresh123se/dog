@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { NavLink, Link, useLocation } from "react-router-dom"; // Added useLocation
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { LogoutButton } from "@/components";
 import {
@@ -24,32 +24,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
-  const location = useLocation(); // Hook to get current path
+  const location = useLocation();
 
-  // Function to scroll to section
-  const scrollToSection = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  // Define nav items with their paths and active colors
+  // Define nav items with their paths and styling
   const navItems = [
-    { path: "/", label: "Home", activeClass: "text-[#018F98]" },
-    ...(location.pathname === "/"
-      ? [
-          {
-            label: "Services",
-            activeClass: "text-blue-900",
-            onClick: () => scrollToSection("services"),
-          },
-        ]
-      : []),
-    { path: "/breed", label: "Breeds", activeClass: "text-indigo-600" },
-    { path: "/blog", label: "Blog", activeClass: "text-teal-500" },
-    { path: "/adoption", label: "Adoption", activeClass: "text-green-600" },
+    { path: "/", label: "Home" },
+    { path: "/services", label: "Services" },
+    { path: "/breed", label: "Breeds" },
+    { path: "/blog", label: "Blog" },
+    { path: "/adoption", label: "Adoption" },
   ];
+
+  // Check if current path matches or starts with the item path
+  const isActivePath = (path) => {
+    return (
+      location.pathname === path ||
+      (path !== "/" && location.pathname.startsWith(path))
+    );
+  };
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50 md:px-10">
@@ -59,36 +51,48 @@ const Nav = () => {
             <Dog className="w-8 h-8 text-[#018F98]" />
             <span className="ml-2 text-2xl font-bold text-[#018F98]">Pets</span>
           </Link>
+
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={item.onClick} // Add onClick for toast functionality
-                className={({ isActive }) =>
-                  `text-gray-700 hover:text-[#1DADC9] transition-colors ${
-                    isActive && !item.onClick ? `${item.activeClass} ` : ""
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const isActive = isActivePath(item.path);
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={`px-3 py-2 font-medium text-sm ${
+                    isActive
+                      ? "text-[#1DADC9] border-b-2 border-[#1DADC9]"
+                      : "text-gray-600 hover:text-[#1DADC9] transition-colors"
+                  }`}
+                >
+                  {item.label}
+                </NavLink>
+              );
+            })}
           </div>
+
           <div className="hidden md:flex items-center space-x-4">
             {!user ? (
               <>
                 <Link
                   to="/login"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium ${
+                    isActivePath("/login")
+                      ? "bg-[#1DADC9] text-white"
+                      : "text-gray-600 hover:text-[#1DADC9]"
+                  } transition-colors`}
                 >
                   <LogIn className="h-4 w-4" />
                   <span>Login</span>
                 </Link>
                 <Link
                   to="/register"
-                  className="flex items-center space-x-1 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium ${
+                    isActivePath("/register")
+                      ? "bg-[#1DADC9] text-white"
+                      : "bg-[#018F98] text-white hover:bg-[#1DADC9]"
+                  } transition-colors`}
                 >
                   <UserPlus className="h-4 w-4" />
                   <span>Register</span>
@@ -98,9 +102,15 @@ const Nav = () => {
               <div className="flex items-center space-x-4">
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none">
-                    <Avatar className="ring ring-[#90b8c0]">
+                    <Avatar
+                      className={`${
+                        isActivePath("/profile")
+                          ? "ring-2 ring-[#1DADC9]"
+                          : "ring ring-[#90b8c0]"
+                      }`}
+                    >
                       <AvatarImage src={user?.avatar?.url} />
-                      <AvatarFallback className="capitalize">
+                      <AvatarFallback className="uppercase font-semibold">
                         {user.name.slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
@@ -123,6 +133,7 @@ const Nav = () => {
               </div>
             )}
           </div>
+
           <button
             className="md:hidden"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -135,32 +146,30 @@ const Nav = () => {
           </button>
         </div>
       </div>
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => {
-                    if (item.onClick) {
-                      item.onClick();
-                    }
-                    setIsMenuOpen(false);
-                  }}
-                  className={({ isActive }) =>
-                    `text-gray-700 hover:text-[#1DADC9] transition-colors ${
-                      isActive && !item.onClick
-                        ? `${item.activeClass} font-bold`
-                        : ""
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              {navItems.map((item) => {
+                const isActive = isActivePath(item.path);
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`px-3 py-2 font-medium text-sm ${
+                      isActive
+                        ? "text-[#1DADC9] border-l-4 border-[#1DADC9] pl-2"
+                        : "text-gray-600 hover:text-[#1DADC9] transition-colors"
+                    }`}
+                  >
+                    {item.label}
+                  </NavLink>
+                );
+              })}
+
               <div className="relative">
                 <input
                   type="text"
@@ -169,11 +178,16 @@ const Nav = () => {
                 />
                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
               </div>
+
               {!user ? (
                 <div className="space-y-1">
                   <Link
                     to="/login"
-                    className="text-gray-700 hover:bg-[#1E3A8A]/90 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
+                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                      isActivePath("/login")
+                        ? "bg-[#1DADC9] text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <LogIn className="h-5 w-5 mr-2" />
@@ -181,7 +195,11 @@ const Nav = () => {
                   </Link>
                   <Link
                     to="/register"
-                    className="text-gray-700 hover:bg-[#1E3A8A]/90 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
+                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                      isActivePath("/register")
+                        ? "bg-[#1DADC9] text-white"
+                        : "bg-[#018F98] text-white hover:bg-[#1DADC9]"
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <UserPlus className="h-5 w-5 mr-2" />
@@ -190,13 +208,23 @@ const Nav = () => {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <div className="flex items-center px-3 py-2 text-gray-700">
+                  <div
+                    className={`flex items-center px-3 py-2 ${
+                      isActivePath("/profile")
+                        ? "text-[#1DADC9]"
+                        : "text-gray-700"
+                    }`}
+                  >
                     <UserCircle className="h-6 w-6 mr-2" />
                     <span>{user.name}</span>
                   </div>
                   <Link
                     to="/profile"
-                    className="text-gray-700 hover:bg-[#1E3A8A]/90 hover:text-white block px-3 py-2 rounded-md text-base font-medium flex items-center"
+                    className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
+                      isActivePath("/profile")
+                        ? "bg-[#1DADC9] text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <UserCircle className="h-5 w-5 mr-2" />

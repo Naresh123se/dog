@@ -4,6 +4,7 @@ import DashboardPage from "./DashboardPage";
 import DistributorPage from "./DistributorPage";
 import BlogPage from "./BlogPage";
 import UsersPage from "./UsersPage";
+import ServicesPage from "./ServicesPage";
 export {
   DashboardPage,
   DistributorPage,
@@ -11,4 +12,5 @@ export {
   BlogPage,
   UsersPage,
   AdminDashboardPage,
+  ServicesPage,
 };

@@ -1,76 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useGetAllBlogsQuery } from "@/app/slices/adminApiSlice";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { 
-  FileText, 
-  Search, 
-  MoreHorizontal, 
-  PenTool, 
-  Calendar, 
-  Tag, 
-  Eye, 
-  Edit, 
-  Trash, 
-  Plus 
-} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  FileText,
+  Search,
+  MoreHorizontal,
+  PenTool,
+  Calendar,
+  Tag,
+  Eye,
+  Edit,
+  Trash,
+  Plus,
+} from "lucide-react";
 
 const AdminBlogs = () => {
   const { data, isLoading, error } = useGetAllBlogsQuery();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
 
-  if (error) return (
-    <div className="p-4 text-center text-red-500">
-      Error loading blogs: {error.toString()}
-    </div>
-  );
+  if (error)
+    return (
+      <div className="p-4 text-center text-red-500">
+        Error loading blogs: {error.toString()}
+      </div>
+    );
 
   // Filter blogs based on search term
-  const filteredBlogs = data?.blogs?.filter(blog => 
-    blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    blog.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    blog.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredBlogs = data?.blogs?.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Format date to readable format
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   // Truncate text if it's too long
   const truncateText = (text, maxLength = 50) => {
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+    return text.substring(0, maxLength) + "...";
   };
 
   return (
@@ -96,9 +99,6 @@ const AdminBlogs = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button className="ml-2">
-              <Plus className="mr-1 h-4 w-4" /> New Blog
-            </Button>
           </div>
         </div>
       </CardHeader>

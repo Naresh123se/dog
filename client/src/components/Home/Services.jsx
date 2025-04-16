@@ -35,9 +35,7 @@ function ServiceCard({ icon: Icon, title, description, color }) {
       <p className="text-gray-600 leading-relaxed mb-6 relative z-10">
         {description}
       </p>
-      <Button className="py-2 px-6 text-sm font-medium rounded-full text-white transition-all duration-300 relative z-10 hover:shadow-lg hover:scale-105">
-        Learn More
-      </Button>
+     
     </div>
   );
 }

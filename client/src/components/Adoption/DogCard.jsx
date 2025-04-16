@@ -126,7 +126,7 @@ export const DogCard = ({ dog, onEdit }) => {
                 <>
                   <Button
                     variant="outline"
-                    className="flex-1 hover:bg-red-50 hover:border-red-300"
+                    className="flex-1 bg-red-100 hover:bg-red-50 hover:border-red-300"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(e);

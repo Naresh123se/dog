@@ -43,7 +43,7 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
       healthIssues: "",
       energyLevel: "",
       hypoallergenic: false,
-      images: [], // Array of base64 strings
+      images: [],
     },
   });
 
@@ -54,13 +54,11 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
       setErrorMessage("Please select at least one image.");
       return;
     }
-    // Check total images won't exceed limit
     if (imagePreviews.length + files.length > MAX_IMAGES) {
       setErrorMessage(`Maximum ${MAX_IMAGES} images allowed`);
       return;
     }
 
-    // Validate file sizes
     const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
     if (oversizedFiles.length > 0) {
       toast.error(`Some images exceed 5MB limit`);
@@ -70,7 +68,6 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
     setUploading(true);
     setErrorMessage("");
 
-    // Process each file to base64
     const promises = files.map((file) => {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -102,7 +99,6 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
     setValue("images", newPreviews, { shouldDirty: true });
   };
 
-  // Initialize form with breed data
   useEffect(() => {
     if (breed) {
       reset({
@@ -117,7 +113,7 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
         healthIssues: breed.healthIssues || "",
         energyLevel: breed.energyLevel || "",
         hypoallergenic: breed.hypoallergenic || false,
-        images: breed.images || [], // Initialize with existing base64 strings
+        images: breed.images || [],
       });
       if (breed.images?.length) {
         setImagePreviews(breed.images);
@@ -167,20 +163,35 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="grid gap-4 py-4 px-1">
             <div className="space-y-4">
-              {/* Form Fields */}
+              {/* Name */}
               <div>
                 <Label htmlFor="name">Name *</Label>
                 <Input
                   id="name"
                   {...register("name", { required: "Name is required" })}
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
+              {/* Origin */}
               <div>
                 <Label htmlFor="origin">Origin *</Label>
-                <Input id="origin" {...register("origin")} />
+                <Input
+                  id="origin"
+                  {...register("origin", { required: "Origin is required" })}
+                />
+                {errors.origin && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.origin.message}
+                  </p>
+                )}
               </div>
 
+              {/* Size */}
               <div>
                 <Label htmlFor="size">Size *</Label>
                 <Select
@@ -198,38 +209,97 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
                     <SelectItem value="Large">Large</SelectItem>
                   </SelectContent>
                 </Select>
+                {!watch("size") && (
+                  <p className="text-sm text-red-500 mt-1">Size is required</p>
+                )}
               </div>
 
+              {/* Lifespan */}
               <div>
                 <Label htmlFor="lifespan">Lifespan *</Label>
-                <Input id="lifespan" {...register("lifespan")} />
+                <Input
+                  id="lifespan"
+                  {...register("lifespan", {
+                    required: "Lifespan is required",
+                  })}
+                />
+                {errors.lifespan && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.lifespan.message}
+                  </p>
+                )}
               </div>
 
+              {/* Temperament */}
               <div>
                 <Label htmlFor="temperament">Temperament</Label>
                 <Input id="temperament" {...register("temperament")} />
               </div>
 
+              {/* Grooming */}
               <div>
                 <Label htmlFor="grooming">Grooming</Label>
                 <Input id="grooming" {...register("grooming")} />
               </div>
 
+              {/* Exercise */}
               <div>
-                <Label htmlFor="exercise">Exercise</Label>
-                <Input id="exercise" {...register("exercise")} />
+                <Label htmlFor="exercise">Exercise *</Label>
+                <Select
+                  onValueChange={(value) =>
+                    setValue("exercise", value, { shouldDirty: true })
+                  }
+                  value={watch("exercise") || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select exercise needs" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Moderate">Moderate</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Very High">Very High</SelectItem>
+                  </SelectContent>
+                </Select>
+                {!watch("exercise") && (
+                  <p className="text-sm text-red-500 mt-1">
+                    Exercise is required
+                  </p>
+                )}
               </div>
 
+              {/* Diet */}
               <div>
                 <Label htmlFor="diet">Diet *</Label>
-                <Input id="diet" {...register("diet")} />
+                <Select
+                  onValueChange={(value) =>
+                    setValue("diet", value, { shouldDirty: true })
+                  }
+                  value={watch("diet") || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select diet type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Standard">Standard</SelectItem>
+                    <SelectItem value="High-Protein">High-Protein</SelectItem>
+                    <SelectItem value="Grain-Free">Grain-Free</SelectItem>
+                    <SelectItem value="Raw">Raw</SelectItem>
+                    <SelectItem value="Specialized">Specialized</SelectItem>
+                  </SelectContent>
+                </Select>
+                {!watch("diet") && (
+                  <p className="text-sm text-red-500 mt-1">Diet is required</p>
+                )}
               </div>
 
+              {/* Health Issues */}
               <div>
-                <Label htmlFor="healthIssues">Health Issues *</Label>
+                <Label htmlFor="healthIssues">Health Issues</Label>
                 <Input id="healthIssues" {...register("healthIssues")} />
               </div>
 
+              {/* Energy Level */}
               <div>
                 <Label htmlFor="energyLevel">Energy Level *</Label>
                 <Select
@@ -247,8 +317,14 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
                     <SelectItem value="High">High</SelectItem>
                   </SelectContent>
                 </Select>
+                {!watch("energyLevel") && (
+                  <p className="text-sm text-red-500 mt-1">
+                    Energy level is required
+                  </p>
+                )}
               </div>
 
+              {/* Hypoallergenic */}
               <div>
                 <Label htmlFor="hypoallergenic">Hypoallergenic *</Label>
                 <Select
@@ -265,9 +341,14 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
                     <SelectItem value="false">No</SelectItem>
                   </SelectContent>
                 </Select>
+                {watch("hypoallergenic") === undefined && (
+                  <p className="text-sm text-red-500 mt-1">
+                    Hypoallergenic is required
+                  </p>
+                )}
               </div>
 
-              {/* Image Upload Section */}
+              {/* Image Upload */}
               <div className="space-y-2">
                 <Label>Breed Images *</Label>
                 <Input
@@ -290,8 +371,13 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
                   {uploading ? "Uploading..." : "Upload Images"}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center">
-                 5MB image (JPEG, PNG)
+                  5MB image (JPEG, PNG)
                 </p>
+                {imagePreviews.length === 0 && (
+                  <p className="text-sm text-red-500 text-center mt-1">
+                    At least one image is required
+                  </p>
+                )}
               </div>
 
               {/* Image Previews */}
@@ -337,7 +423,7 @@ const BreedForm = ({ breed, onSubmit, onClose, isLoading }) => {
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={!isDirty || isLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? (
                   <span className="flex items-center">
                     <svg
