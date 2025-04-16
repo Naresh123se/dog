@@ -5,6 +5,7 @@ import User from "../models/userModel.js";
 import ErrorHandler from "../utils/ErrorHandler.js";
 import cloudinary from "cloudinary";
 import axios from "axios";
+import Payment from "../models/Payment.js";
 
 class DogController {
   // Add new dog
@@ -133,7 +134,7 @@ class DogController {
       website_url: "http://localhost:3000", // Your website URL
       amount: amount * 100, // Convert to paisa
       purchase_order_id: dogId,
-      purchase_order_name: dogname,
+      purchase_order_name: "DOG",
       customer_info: {
         name: name,
         email: email,
@@ -168,33 +169,55 @@ class DogController {
 
   static completePayment = asyncHandler(async (req, res, next) => {
     const { pidx } = req.query;
-    // const { dog } = req.query;
+    const { dogId } = req.body;
 
-    if (!pidx) {
-      return res
-        .status(400)
-        .json({ success: false, message: "pidx is required" });
+    if (!pidx || !dogId) {
+      return res.status(400).json({
+        success: false,
+        message: "pidx and dogId are required",
+      });
+    }
+
+    // Check if payment was already processed
+    const existingPayment = await Payment.findOne({ pidx });
+    if (existingPayment) {
+      return res.status(200).json({
+        success: true,
+        message: "Payment already processed",
+        payment: existingPayment,
+      });
     }
 
     try {
+      // Verify payment with Khalti
       const verificationResponse = await axios.post(
         `${process.env.KHALTI_GATEWAY_URL}/api/v2/epayment/lookup/`,
         { pidx },
         {
           headers: {
-            Authorization: `key ${process.env.KHALTI_SECRET_KEY}`,
+            Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
             "Content-Type": "application/json",
           },
         }
       );
-
+      const user = req.user?._id;
       const paymentInfo = verificationResponse.data;
+      console.log(paymentInfo);
 
       if (paymentInfo.status === "Completed") {
+        // Create payment record
+        const payment = await Payment.create({
+          pidx,
+          dogId,
+          status: "completed",
+          amount: paymentInfo.total_amount / 100, // Convert to rupees
+          paymentDetails: paymentInfo,
+          userId: user,
+        });
 
-        // Update the dog's isPay status to true
+        // Update dog status
         const updatedDog = await Dog.findByIdAndUpdate(
-          dog,
+          dogId,
           { isPay: true },
           { new: true }
         );
@@ -209,7 +232,7 @@ class DogController {
         res.json({
           success: true,
           message: "Payment verified and dog status updated",
-          paymentInfo,
+          payment,
           dog: updatedDog,
         });
       } else {
@@ -220,7 +243,7 @@ class DogController {
         });
       }
     } catch (error) {
-      console.error(error.response ? error.response.data : error.message);
+      console.error("Payment verification error:", error);
       res.status(500).json({
         success: false,
         message: "Payment verification failed",

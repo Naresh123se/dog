@@ -54,14 +54,15 @@ export const dogApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     //kahlti completePayment
-    completePayment: builder.query({
-      query: (pidx) => ({
+    completePayment: builder.mutation({
+      query: ({ pidx, dogId }) => ({
         url: `${dog_url}/complete-payment?pidx=${pidx}`,
-        method: "GET",
+        method: "PUT",
+        body: { dogId },
         credentials: "include",
       }),
     }),
-    
+
     //kahlti initiatePayment
     initiatePayment: builder.mutation({
       query: (data) => ({
@@ -81,6 +82,6 @@ export const {
   useGetDogByIdQuery,
   useGetDogsByBreedQuery,
   useDeleteDogMutation,
-  useCompletePaymentQuery,
+  useCompletePaymentMutation,
   useInitiatePaymentMutation,
 } = dogApiSlice;

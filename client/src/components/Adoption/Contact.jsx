@@ -8,7 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,14 +21,14 @@ import {
   MessageCircle,
   CheckCircle,
   Loader2,
-  X,
 } from "lucide-react";
 import { PawPrint } from "lucide-react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
-  useCompletePaymentQuery,
+  useCompletePaymentMutation,
   useInitiatePaymentMutation,
+  useGetAllDogsQuery,
 } from "@/app/slices/dogApiSlice";
 
 export default function Contact({ dogData }) {
@@ -44,9 +43,14 @@ export default function Contact({ dogData }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const user = useSelector((state) => state.auth?.user?.role);
   const [submitted, setSubmitted] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [pidx, setPidx] = useState(null);
-  const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
+  const [initiatePayment, { isLoading: isPaymentLoading }] =
+    useInitiatePaymentMutation();
+  const [completePayment, { isLoading: isVerifyLoading }] =
+    useCompletePaymentMutation();
   const [paymentResult, setPaymentResult] = useState(null);
+  const { refetch } = useGetAllDogsQuery();
 
   const {
     register,
@@ -65,51 +69,45 @@ export default function Contact({ dogData }) {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const pidxFromUrl = urlParams.get("pidx");
-    if (pidxFromUrl) {
-      setPidx(pidxFromUrl);
-      setIsDialogOpen(true);
-    }
-  }, []);
 
-const {
-  data: paymentData,
-  isLoading: verifyLoading,
-  error: verifyError,
-} = useCompletePaymentQuery(
-  { pidx, dog: dog.id },
-  {
-    skip: !pidx || !dog?.id,
-  }
-);
+    // Add early return if no pidx or already submitted
+    if (!pidxFromUrl || submitted) return;
 
+    setPidx(pidxFromUrl);
+    setIsDialogOpen(true);
+    handlePaymentVerification(pidxFromUrl);
 
+    // Clean up URL after verification starts
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [submitted]); // Add submitted as dependency
 
-  useEffect(() => {
-    if (paymentData) {
-      setPaymentResult(paymentData);
+  const handlePaymentVerification = async (pidx) => {
+    if (!pidx || submitted) return;
+    try {
+      console.log("Payment verification for dog ID:", dog?.id);
+      const paymentData = await completePayment({
+        pidx,
+        dogId: dog?.id,
+      }).unwrap();
       if (paymentData.success) {
+        setPaymentResult(paymentData);
         setSubmitted(true);
+        setShowSuccessPopup(true);
         toast.success("Payment Verified Successfully");
       } else {
-        toast.error(paymentData.message || "Payment Verification Failed");
+        toast.error(paymentData.message || "Payment verification failed");
       }
+    } catch (error) {
+      toast.error(error?.data?.message || "Payment verification failed");
     }
-    if (verifyError) {
-      setPaymentResult({
-        success: false,
-        message: verifyError?.data?.message || "Verification failed",
-      });
-      toast.error(verifyError?.data?.message || "Verification failed");
-    }
-  }, [paymentData, verifyError]);
+  };
 
   const handlePayment = async (data) => {
     try {
       const paymentData = {
         ...data,
-        dogId: dog.id,
+        dogId: dog?.id,
         amount: dog.price,
-        dogname: dog.name,
       };
 
       const res = await initiatePayment(paymentData).unwrap();
@@ -128,21 +126,30 @@ const {
     setPaymentResult(null);
     setPidx(null);
     setSubmitted(false);
+    setShowSuccessPopup(false);
     reset();
     window.history.pushState({}, document.title, window.location.pathname);
     setIsDialogOpen(false);
+    refetch();
+  };
+
+  // Handle dialog open state change attempts
+  const handleOpenChange = (open) => {
+    // If trying to close and already submitted (success state), prevent auto-closing
+    if (!open && submitted) {
+      return; // Don't update the state, preventing dialog from closing
+    }
+    // Otherwise allow the dialog state to change
+    setIsDialogOpen(open);
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      {user === "user" && (
-        <DialogTrigger asChild>
-          <Button onClick={() => setIsDialogOpen(true)} className="w-full">
-            Contact & Adopt
-          </Button>
+    <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
+      {user === "user" ? (
+        <DialogTrigger asChild className="w-full">
+          <Button className="w-full">Contact & Adopt</Button>
         </DialogTrigger>
-      )}
-      {user !== "user" && user !== "breeder" && (
+      ) : (
         <Button
           onClick={(e) => {
             e.preventDefault();
@@ -156,21 +163,18 @@ const {
       <DialogContent
         className="sm:max-w-md"
         onInteractOutside={(e) => {
-          if (submitted) e.preventDefault();
+          // Prevent closing when clicking outside if in success state
+          if (submitted) {
+            e.preventDefault();
+          }
         }}
         onEscapeKeyDown={(e) => {
-          if (submitted) e.preventDefault();
+          // Prevent closing on Escape key if in success state
+          if (submitted) {
+            e.preventDefault();
+          }
         }}
       >
-        {submitted && (
-          <DialogClose
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-            onClick={resetForm}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogClose>
-        )}
         <ScrollArea className="max-h-[calc(100vh-8rem)]">
           {!submitted ? (
             <>
@@ -209,13 +213,13 @@ const {
                   </div>
                 </div>
 
-                {verifyLoading ? (
+                {isVerifyLoading ? (
                   <div className="flex flex-col items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-4" />
                     <p className="text-gray-600">Verifying your payment...</p>
                   </div>
                 ) : (
-                  <form onSubmit={(e) => e.preventDefault()}>
+                  <form onSubmit={handleSubmit(handlePayment)}>
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label
@@ -302,12 +306,11 @@ const {
                       </div>
                       <DialogFooter className="pt-4">
                         <Button
-                          type="button"
-                          onClick={handleSubmit(handlePayment)}
-                          disabled={isLoading}
+                          type="submit"
+                          disabled={isPaymentLoading}
                           className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
-                          {isLoading ? (
+                          {isPaymentLoading ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Processing...
@@ -329,10 +332,8 @@ const {
               </div>
               <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
               <p className="text-gray-600 mb-6">
-                Your payment for{" "}
-                <span className="text-green-500">{dog.name}</span> has been
-                processed. The breeder will be notified and will contact you
-                shortly with next steps.
+                Your payment for {dog.name} has been processed. The breeder will
+                be notified and will contact you shortly with next steps.
               </p>
               <div className="bg-blue-50 p-4 rounded-md text-left mb-6">
                 <h3 className="font-medium text-blue-800 mb-1">

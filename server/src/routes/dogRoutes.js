@@ -13,15 +13,15 @@ dogRouter.post(
   authorizeRoles("user"),
   DogController.initiatePayment
 );
-dogRouter.get(
+dogRouter.put(
   "/complete-payment",
   isAuthenticated,
   DogController.completePayment
 );
-
 dogRouter.get("/all-dogs", DogController.getAllDogs);
 dogRouter.get("/dog/:id", DogController.getDog);
 dogRouter.get("/dogs-by-breed/:breedId", DogController.getDogsByBreed);
+
 
 dogRouter.put("/update-dog/:id", isAuthenticated, DogController.updateDog);
 
