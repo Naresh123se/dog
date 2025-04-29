@@ -14,7 +14,7 @@ function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const { data, refetch, isLoading } = useGetUserProfileQuery();
   const [updateProfile, { isLoading: updateLoading }] =
-    useUpdateUserProfileMutation();
+  useUpdateUserProfileMutation();
   const user = data?.user;
 
   const [profile, setProfile] = useState({
@@ -112,21 +112,7 @@ function Profile() {
     setIsEditing(false);
   };
 
-  const StatCard = ({ icon: Icon, label, value, className = "" }) => (
-    <div
-      className={`bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300 ${className}`}
-    >
-      <div className="flex items-center space-x-4">
-        <div className="p-3 bg-indigo-50 rounded-xl">
-          <Icon className="w-7 h-7 text-indigo-600" />
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 mb-1">{label}</p>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
+
 
   const InputField = ({
     icon: Icon,

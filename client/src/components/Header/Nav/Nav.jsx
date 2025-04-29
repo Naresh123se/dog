@@ -20,11 +20,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useGetUserProfileQuery } from "@/app/slices/userApiSlice";
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
+  const { data: Userdata } = useGetUserProfileQuery();
 
   // Define nav items with their paths and styling
   const navItems = [
@@ -42,6 +44,7 @@ const Nav = () => {
       (path !== "/" && location.pathname.startsWith(path))
     );
   };
+  const profile = Userdata?.user?.avatar?.url;
 
   return (
     <nav className="bg-white shadow-lg sticky top-0 z-50 md:px-10">
@@ -109,7 +112,7 @@ const Nav = () => {
                           : "ring ring-[#90b8c0]"
                       }`}
                     >
-                      <AvatarImage src={user?.avatar?.url} />
+                      <AvatarImage src={profile} />
                       <AvatarFallback className="uppercase font-semibold">
                         {user.name.slice(0, 2)}
                       </AvatarFallback>

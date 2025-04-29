@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useGetAllDogsQuery } from "@/app/slices/dogApiSlice";
 
-function PetCard({ photo, name, breed, age }) {
+function PetCard({ photos, name, breed, age }) {
   const navigate = useNavigate();
 
   const handleLearnMore = () => {
@@ -11,15 +11,24 @@ function PetCard({ photo, name, breed, age }) {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 min-w-[280px] max-w-[280px]">
       <div className="relative">
-        <img
-          src={
-            photo && photo.length > 0
-              ? photo[0].url
-              : "/api/placeholder/280/200"
-          }
-          alt={name}
-          className="w-full h-56 object-cover"
-        />
+        {photos && photos.length > 0 ? (
+          <div className="flex overflow-x-auto w-full h-56">
+            {photos.map((photo) => (
+              <img
+                key={photo._id}
+                src={photo.url}
+                alt={name}
+                className="flex-shrink-0 w-full object-cover"
+                loading="lazy"
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">No image</span>
+          </div>
+        )}
+
         <div className="absolute top-0 right-0 bg-primary text-white px-3 py-1 m-2 rounded-full text-sm font-medium">
           Available
         </div>
@@ -85,7 +94,7 @@ export function AvailablePets() {
                 {pets.map((pet) => (
                   <PetCard
                     key={pet._id}
-                    photo={pet.photo}
+                    photos={pet.photos}
                     name={pet.name}
                     breed={pet.breed}
                     age={pet.age}

@@ -62,18 +62,22 @@ export const DogCard = ({ dog, onEdit }) => {
         <Card className="w-full max-w-sm mx-auto overflow-hidden shadow-lg rounded-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer h-full flex flex-col">
           <div className="relative flex-1 flex flex-col">
             <div className="relative">
-              {dog.photo && dog.photo.length > 0 ? (
-                <img
-                  src={dog.photo[0].url}
-                  alt={dog.name}
-                  className="w-full h-56 object-cover"
-                  loading="lazy"
-                />
+              {dog.photos && dog.photos.length > 0 ? (
+                dog.photos.map((photo) => (
+                  <img
+                    key={photo._id}
+                    src={photo.url}
+                    alt={dog.name}
+                    className="w-full h-56 object-cover"
+                    loading="lazy"
+                  />
+                ))
               ) : (
                 <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
                   <span className="text-gray-400">No image</span>
                 </div>
               )}
+
               <div className="absolute top-0 left-0 right-0 flex justify-between p-4">
                 <Badge className={`${getAgeColor(dog.age)} shadow-md`}>
                   {dog.age <= 1 ? "Puppy" : dog.age <= 7 ? "Adult" : "Senior"} (

@@ -38,7 +38,7 @@ app.use('/', router);
 app.get('/test', (req, res, next) => {
   res.status(200).json({
     success: true,
-    message: 'Creators Club Working Fine',
+    message: 'Working Fine',
   });
 });
 

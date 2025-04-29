@@ -1,5 +1,4 @@
 import { Heart, Users, Dog, Bone, Stethoscope, Scissors } from "lucide-react";
-import { Button } from "../ui/button";
 
 function ServiceCard({ icon: Icon, title, description, color }) {
   return (

@@ -161,9 +161,11 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
         ...dog,
         photos: dog.photos || [],
       });
-      if (dog.photos?.length) {
-        setImagePreviews(dog.photos);
+
+      if (dog.photos && Array.isArray(dog.photos)) {
+        setImagePreviews(dog.photos.map((img) => img.url));
       }
+
     } else {
       reset({
         name: "",

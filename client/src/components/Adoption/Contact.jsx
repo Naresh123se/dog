@@ -145,27 +145,35 @@ export default function Contact({ dogData }) {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
-      {user === "user" && (
-        <DialogTrigger asChild className="w-full">
-          <Button className="w-full">Contact & Adopt</Button>
-        </DialogTrigger>
-      )}
-
-<div className=" flex items-center gap-10">
-
-      {user !== "user" && user !== "breeder" && (
-        <Button
-        onClick={(e) => {
-          e.preventDefault();
-          toast.info("Please login first to adopt a pet");
-        }}
-        >
-          Contact & Adopt
-        </Button>
-      )}
-
-      <PedigreeCertificate dog={dog} />
+      <div className="flex gap-10">
+        {user === "user" && (
+          <>
+            <DialogTrigger asChild className="w-full">
+              <Button className="w-full">Contact & Adopt</Button>
+            </DialogTrigger>
+            <PedigreeCertificate dog={dog} />
+          </>
+        )}
       </div>
+
+      <div className=" flex  items-center gap-10">
+        {user !== "user" && user !== "breeder" && (
+          <>
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                toast.info("Please login first to adopt a pet");
+              }}
+            >
+              Contact & Adopt
+            </Button>
+
+            <PedigreeCertificate dog={dog} />
+          </>
+        )}
+      </div>
+
+      {user === "breeder" && <PedigreeCertificate dog={dog} />}
 
       <DialogContent
         className="sm:max-w-md"
@@ -351,7 +359,7 @@ export default function Contact({ dogData }) {
                   <li>They will reach out to arrange a meeting or delivery</li>
                 </ul>
               </div>
-              <Button onClick={resetForm} variant="outline">
+              <Button onClick={resetForm} variant="">
                 Close
               </Button>
             </div>

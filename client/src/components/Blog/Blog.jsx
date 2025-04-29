@@ -38,8 +38,15 @@ function Blog() {
 
   const blogPosts = Array.isArray(data?.blogs) ? data.blogs : [];
   const user = useSelector((state) => state.auth.user);
-  const isOwner = blogPosts.map((post) => post?.owner === user?._id);
+  const isOwner = {};
 
+  blogPosts.forEach((post) => {
+    if (post?._id) {
+      isOwner[post._id] = post?.owner === user?._id;
+    }
+  });
+
+  console.log(blogPosts)
   const handleEditClick = (blog) => {
     setSelectedBlog(blog);
     setIsEditDialogOpen(true);
@@ -158,7 +165,7 @@ function Blog() {
                             By {post.author || "Unknown author"}
                           </span>
 
-                          {isOwner && (
+                          {isOwner[post._id] && (
                             <div className="flex gap-2">
                               <Button
                                 size="icon"
