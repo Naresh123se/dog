@@ -214,7 +214,7 @@ export const AddEditDogForm = ({ dog, onClose, onSubmit, isLoading }) => {
             <div className="flex-shrink-0 w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center text-yellow-400 relative">
               <Shield size={24} />
               <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-yellow-400">
-                IKC
+              Pets
               </div>
             </div>
             <DialogTitle className="text-2xl">

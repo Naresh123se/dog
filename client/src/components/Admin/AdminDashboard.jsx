@@ -5,10 +5,7 @@ import {
   PawPrint,
   DollarSign,
   ArrowUp,
-  ArrowDown,
-  FileText,
-  Settings,
-  AlertCircle,
+  ArrowDown
 } from "lucide-react";
 import {
   BarChart,
@@ -81,7 +78,6 @@ const AdminDashboard = () => {
   const totalBreeds = breedsData?.count || 0;
   const totalDogs = dogsData?.count || 0;
   const totalUsers = usersData?.count || 0;
-  const totalBlogs = blogsData?.count || 0;
 
   // Estimated revenue based on dog prices
   const totalRevenue =

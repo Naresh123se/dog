@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server  # Path to your backend directory
+    container_name: backend  # Name of the backend container
+    ports:
+      - "5000:5000"  # Expose backend port 5000 to the host machine
+    env_file: 
+      - ./server/.env  # Backend environment variables file
+    environment:
+      - MONGO_URI=${MONGODB_URI}  # MongoDB URI environment variable from .env
+    depends_on:
+      - mongo  # Ensure the MongoDB container is ready before starting the backend
+
+  mongo:
+    image: mongo:6  # Use official MongoDB image, version 6
+    container_name: mongo  # Name of the MongoDB container
+    ports:
+      - "27017:27017"  # Expose MongoDB port 27017 to the host machine
+    volumes:
+      - Dogs:/data/db  # Persistent volume for MongoDB data, so data persists across container restarts
+
+  frontend:
+    build:
+      context: ./client  # Path to your frontend directory
+    container_name: frontend  # Name of the frontend container
+    ports:
+      - "3000:3000"  # Expose frontend port 3000 to the host machine
+    depends_on:
+      - backend  # Ensure the backend service is ready before the frontend starts
+    env_file: 
+      - ./client/.env 
+    environment:
+      - VITE_API_URL=http://backend:5000  # Set the backend API URL to connect with the backend container
+
+volumes:
+  Dogs:
+    name: Dogs  # Named volume to persist MongoDB data

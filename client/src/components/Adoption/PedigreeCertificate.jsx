@@ -108,9 +108,7 @@ export default function PedigreeCertificate({ dog }) {
               <div className="flex-grow relative">
                 {/* Watermark */}
                 <div className="absolute inset-1 flex mt-10 justify-center opacity-10 pointer-events-none">
-                  <div className="text-7xl font-bold text-blue-900 ">
-                    PETS
-                  </div>
+                  <div className="text-7xl font-bold text-blue-900 ">PETS</div>
                 </div>
 
                 {/* Pedigree family tree */}
@@ -183,10 +181,10 @@ export default function PedigreeCertificate({ dog }) {
               </div>
               <div className="text-xs text-blue-700">
                 <p>
-                  IKC is International Kennel Club recognized all over the World
+                  Pets is  recognized all over the World
                 </p>
-                <p>www.ikcworld.org</p>
-                <p>IKC Pedigree Version 2.5</p>
+                <p>www.petsExample.org</p>
+                <p>Pets</p>
               </div>
               <div className="w-16 h-16 bg-gray-200"></div>
             </div>
